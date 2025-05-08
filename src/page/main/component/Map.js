@@ -1,3 +1,3 @@
-const Map = () => {
+export const Map = () => {
   return <></>
 }
