@@ -19,8 +19,8 @@ function App() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
               <Nav.Link href="/download">앱 다운로드</Nav.Link>
-              <Nav.Link href="/notice">공지사항</Nav.Link>
-              <Nav.Link href="/qna">QNA</Nav.Link>
+              <Nav.Link href="/notice/list">공지사항</Nav.Link>
+              <Nav.Link href="/qna/list">QNA</Nav.Link>
               <Nav.Link href="/guide">이용가이드</Nav.Link>
               <Nav.Link href="/mypage">마이페이지</Nav.Link>
               <Nav.Link href="/login">로그인</Nav.Link>
@@ -35,8 +35,8 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="/login" element={<Login />} />
           <Route path="/mypage" element={<MyPage />} />
-          <Route path="/notice" element={<Notice />} />
-          <Route path="/qna" element={<Qna />} />
+          <Route path="/notice/*" element={<Notice />} />
+          <Route path="/qna/*" element={<Qna />} />
         </Routes>
       </main>
 
@@ -56,10 +56,10 @@ function App() {
                 <Nav.Link className="text-light" href="/download">
                   앱 다운로드
                 </Nav.Link>
-                <Nav.Link className="text-light" href="/notice">
+                <Nav.Link className="text-light" href="/notice/list">
                   공지사항
                 </Nav.Link>
-                <Nav.Link className="text-light" href="/qna">
+                <Nav.Link className="text-light" href="/qna/list">
                   QNA
                 </Nav.Link>
               </Nav>
@@ -70,5 +70,5 @@ function App() {
     </Container>
   )
 }
-
+// test
 export default App
