@@ -3,6 +3,7 @@ from gitdb.exc import BadName
 from service.notion_service import NotionService
 from service.slack_service import SlackService
 from service.git_service import GitService
+import sys
 
 def update_commit(git_service, notion_service, commit):
     commit_message, commit_hash, changed_files, commit_date, ai_summary = git_service.get_commit_info(commit)
@@ -36,9 +37,10 @@ def update_all_new_commits():
 
 # 메인 실행
 if __name__ == "__main__":
+    github_actor = sys.argv[1]
     slack_service = SlackService()
 
     update_all_new_commits()
-    slack_service.send_alarm("front:push가 완료되었습니다.")
+    slack_service.send_alarm(f"front: {github_actor}님이 push하셨습니다.")
 
 
