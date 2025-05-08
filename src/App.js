@@ -1,6 +1,6 @@
 import './App.css'
 import Main from './page/main/Main'
-import Board from './page/board/Board'
+import {Qna, Notice} from './page/board'
 import {Login, MyPage, SignIn} from './page/member'
 import {Routes, Route} from 'react-router-dom'
 import {Container, Row, Col, Navbar, Nav} from 'react-bootstrap'
@@ -10,14 +10,9 @@ function App() {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <Container fluid className="App">
+    <Container fluid className="App p-0">
       {/* Header */}
-      <Navbar
-        expand="md"
-        bg="light"
-        className="py-3"
-        expanded={expanded}
-        onToggle={setExpanded}>
+      <Navbar expand="md" bg="light" className="py-3" expanded={expanded} onToggle={setExpanded}>
         <Container>
           <Navbar.Brand href="/">안심누리</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -40,8 +35,8 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="/login" element={<Login />} />
           <Route path="/mypage" element={<MyPage />} />
-          <Route path="/notice" element={<Board />} />
-          <Route path="/qna" element={<Board />} />
+          <Route path="/notice" element={<Notice />} />
+          <Route path="/qna" element={<Qna />} />
         </Routes>
       </main>
 
