@@ -1,3 +1,3 @@
 export const Chat = () => {
-  return <></>
+  return <div>채팅창</div>
 }

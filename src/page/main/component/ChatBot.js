@@ -1,3 +1,3 @@
 export const ChatBot = () => {
-  return <></>
+  return <div>챗봇</div>
 }

@@ -1,3 +1,3 @@
 export const List = () => {
-  return <></>
+  return <div>리스트</div>
 }

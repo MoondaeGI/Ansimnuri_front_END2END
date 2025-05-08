@@ -3,6 +3,7 @@ import {Chat, ChatBot, Map, News} from './component'
 const Main = () => {
   return (
     <div>
+      메인
       <div>
         <News />
         <Map />
