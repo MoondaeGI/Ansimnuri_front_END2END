@@ -1,3 +1,3 @@
-const Detail = () => {
+export const Detail = () => {
   return <></>
 }

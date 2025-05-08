@@ -1,3 +1,3 @@
-const Write = () => {
+export const Write = () => {
   return <></>
 }
