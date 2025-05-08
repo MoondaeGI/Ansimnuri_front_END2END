@@ -1,7 +1,7 @@
 import { Detail, List, Write } from "./component";
 
-const Board = (type) => {
-  return <div>게시판</div>;
+const Board = ({type}) => {
+  return <div>{type}</div>;
 };
 
 export default Board;
