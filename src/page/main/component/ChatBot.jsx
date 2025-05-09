@@ -26,6 +26,14 @@ export const ChatBot = () => {
       "법률적 지원제도",
       "심리치료 지원제도",
       "기타 지원제도"
+    ],
+    "자주 묻는 질문 (FAQ)": [
+      "어떤 사이트인가요?",
+      "사이트 이용 방법",
+      "GPS 꺼져 있을시 서비스 작동 유무",
+      "회원가입 없이 사용할 수 있는 기능",
+      "관리자 문의 방법"
+
     ]
   };
 
@@ -48,7 +56,7 @@ export const ChatBot = () => {
     - 줄바꿈은 자연스럽게 하고, 말풍선에 적합하도록 문단 간 간격을 고려
     질문: ${input}`;
 
-    const res = await fetch("http://localhost:8080/api/chat", {
+    const res = await fetch("http://localhost:80/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -122,7 +130,7 @@ export const ChatBot = () => {
       <div className="input-area">
         <input
           type="text"
-          placeholder="질문을 입력하세요"
+          placeholder="챗봇의 도움이 필요하신가요?"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendQuestion(question)}
