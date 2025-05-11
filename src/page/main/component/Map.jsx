@@ -1,5 +1,5 @@
 import {Note, NoteReply} from "../../../component";
-import {useEffect, useState, useMemo} from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 
 export const Map = () => {
@@ -8,8 +8,7 @@ export const Map = () => {
   useEffect(() => {
     axios.get("http://localhost:80/api/note")
         .then(res => {
-          console.log(res)
-          setNoteList(res.data);
+          setNoteList(res.data.map(dto => <Note dto={dto}/>));
         })
   }, [])
 
