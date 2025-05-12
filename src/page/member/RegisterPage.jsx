@@ -173,24 +173,29 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white shadow-md rounded">
+    <div className="container">
       <h2 className="text-xl font-bold mb-4">회원가입</h2>
       <form onSubmit={handleSubmit}>
+        <div className='box'>
         아이디 <input name="loginId" ref={idInputRef} placeholder="아이디" onChange={handleChange} className="input" />
-        <button className="btn" type="button" onClick={checkId}>중복확인</button><br />
-
+        <button className="btn" type="button" onClick={checkId}>중복확인</button>
+        </div><br />
+   <div className='box'>
         비밀번호 <input name="password" type="password" placeholder="비밀번호" onChange={handleChange} className="input" /><br />
         <div className="text-red-500 text-sm">{pwMessage}</div>
-
+</div>
+   <div className='box'>
         비밀번호 재확인 <input name="rePassword" type="password" placeholder="비밀번호재확인" onChange={handleChange} className="input" />
         <div className="text-sm" style={{ color: pwMatchMessage.includes('일치하지') ? 'red' : 'green' }}>
           {pwMatchMessage}
         </div>
-
+                </div>
+         <div className='box'>
         닉네임 <input name="nickname" ref={nickNameInputRef} placeholder="닉네임" onChange={handleChange} className="input" />
-        <button className="btn" type='button' onClick={checkNickName}>중복확인</button><br />
-
-        이메일 <input type="email" name="email" onChange={handleChange} className="input" /><br />
+        <button className="btn" type='button' onClick={checkNickName}>중복확인</button>
+        </div><br />
+         <div className='box'>
+        이메일 <input type="email" name="email" onChange={handleChange} className="input" /></div><br />
         <div className="text-sm" style={{ color: emailMessage.includes('올바른') ? 'green' : 'red' }}>
           {emailMessage}
         </div>
@@ -199,7 +204,7 @@ const RegisterPage = () => {
           <label>우편번호</label>
           <div className="input-with-btn">
             <input type="text" className="input" name="postcode" value={form.postcode} readOnly />
-            <button type="button" onClick={handlePostcode}>검색</button>
+            <button type="button" className="btn"onClick={handlePostcode}>검색</button>
           </div>
         </div>
 
@@ -243,13 +248,10 @@ const RegisterPage = () => {
 ※ 위 내용을 충분히 이해하였으며, 개인정보 수집 및 이용에 동의합니다.
             `)}>보기</button>
           </label><br />
-          <label>
-            <input type="checkbox" /> 마케팅 정보 수신 동의 (선택)
-            <button type="button" onClick={() => openModal('마케팅 정보 수신 동의 내용입니다.')}>보기</button>
-          </label>
+       
         </div>
 
-        <button type="submit" className="btn mt-4">가입하기</button>
+        <button type="submit"className="btn" >가입하기</button>
       </form>
 
       {showModal && (
@@ -259,7 +261,7 @@ const RegisterPage = () => {
             <pre style={{ whiteSpace: 'pre-wrap' }}>{modalContent}</pre>
             <div className="modal-buttons">
               <button onClick={closeModal}>닫기</button>
-              <button onClick={confirmAndCheck}>확인</button>
+              <button onClick={confirmAndCheck}>동의</button>
             </div>
 
 
