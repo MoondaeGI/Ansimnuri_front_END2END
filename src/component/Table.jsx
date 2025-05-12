@@ -1,17 +1,21 @@
-export const Table = ({columnList, dataList}) => {
+export const Table = ({columnList, dataList, ...props}) => {
   const thead =
-    columnList.map(column => <th>{column}</th>)
+    columnList.map((column, index) => <th key={index}>{column}</th>)
 
   const tbody =
-      dataList.map(data =>
-          <tr>{
-            data.map(data => <td>{data}</td>)
-          }</tr>
+      dataList.map((data, index) =>
+          <tr key={index}>{
+                  Object.entries(data).map(
+                      ([key, value]) => <td key={key}>{value}</td>)
+              }
+          </tr>
       )
 
   return (
-    <table>
-      <thead>{thead}</thead>
+    <table {...props}>
+      <thead>
+        <tr>{thead}</tr>
+      </thead>
       <tbody>{tbody}</tbody>
     </table>
   )
