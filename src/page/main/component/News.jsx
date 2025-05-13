@@ -17,19 +17,16 @@ export const News = () => {
     <div className="newsContainer">
       <div className="newsCardList">
         {newsList.map((article) => (
-          <div className="newsCard" key={article.id || article.title}>
+          <div className="newsCard" key={article.title}>
             <div className="newsImgWrapper">
-              <img src={article.thumbnailImg} alt="뉴스 썸네일" className="newsImg"/>
+              <img src={article.content} alt="뉴스 썸네일" className="newsImg"/>
             </div>
             <div className="newsContent">
               <h3 className="newsTitle">
                 <a href={article.url} className="newsTitleLink" target="_blank" rel="noopener noreferrer">
-                  {article.title}
+                  {article.thumbnailImg}
                 </a>
               </h3>
-              {article.description && (
-                <p className="newsDescription">{article.description}</p>
-              )}
               <p className="newsDate">{new Date(article.regDate).toLocaleString()}</p>
             </div>
           </div>
