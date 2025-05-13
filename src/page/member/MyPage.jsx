@@ -28,6 +28,8 @@ export const MyPage = () => {
           }
         });
         setMember(res.data);
+
+        console.log("데이터값"+res.data.nickname)
         setMemberData({
           nickname: res.data.nickname,
           address: res.data.address,
@@ -48,16 +50,21 @@ export const MyPage = () => {
 
   const checkNickname = async () => {
     try {
-      const res = await caxios.post('/api/member/checkNickName/${memberData.nickname}');
-      if (res.data.available) {
-        alert('사용 가능한 닉네임입니다.');
+    console.log("값"+memberData.nickname)
+const res = await caxios.get(`http://localhost/api/member/checkNickName/${memberData.nickname}`);
+
+  const exists = res.data;
+
+      if (exists) {
+        alert('이미 사용 중인 닉네임입니다.');
         setNicknameChecked(true);
       } else {
-        alert('이미 사용 중인 닉네임입니다.');
+        alert('사용 가능한 닉네임입니다.');
         setNicknameChecked(false);
       }
     } catch (err) {
       alert('중복 확인 중 오류 발생');
+      console.error(err);
     }
   };
 
@@ -75,7 +82,7 @@ export const MyPage = () => {
 
   const requestEmailVerification = async () => {
     try {
-      await caxios.post('/api/member/request-email-auth');
+      await caxios.post('http://localhost/api/member/email');
       alert('인증 메일이 전송되었습니다.');
     } catch (err) {
       alert('메일 전송 실패');
@@ -94,18 +101,30 @@ export const MyPage = () => {
   };
 
   const handleSave = async () => {
-    if (!nicknameChecked) return alert('닉네임 중복 확인을 해주세요.');
+    if (!checkNickname) return alert('닉네임 중복 확인을 해주세요.');
     try {
       await caxios.put('/api/member/me', memberData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('회원 정보가 수정되었습니다.');
-      setEditMode(false);
-    } catch (err) {
-      alert('정보 수정 실패');
-    }
-  };
+const updated = await caxios.get('http://localhost/api/member/me', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    setMember(updated.data);
+    setMemberData({
+      nickname: updated.data.nickname,
+      address: updated.data.address,
+      detailAddress: updated.data.detailAddress,
+      postcode: updated.data.postcode
+    });
 
+    setEditMode(false);
+  } catch (err) {
+    alert('정보 수정 실패');
+  }
+};
   if (!member) return <div>회원 정보를 불러오는 중...</div>;
 
   return (
