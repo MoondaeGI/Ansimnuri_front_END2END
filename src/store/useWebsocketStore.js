@@ -1,7 +1,7 @@
 import {create} from 'zustand'
 
 export const useWebsocketStore = create(set => ({
-    socket: null,
+    noteSocket: null,
     isConnected: false,
 
     connect: (token) => {
@@ -9,10 +9,15 @@ export const useWebsocketStore = create(set => ({
             get().socket.close()
         }
 
-        const ws = new WebSocket('ws://localhost:80/ws/note/' + token)
-        ws.onopen = () => {
-            set({isConnected: true})
+        const noteWs = new WebSocket('ws://localhost:80/ws/note/' + token)
+        noteWs.onopen = () => {
+            set({noteSocket: noteWs, isConnected: true})
         }
-        set({socket: ws})
     },
+
+    disconnect: () => {
+        if (get().noteSocket) {
+            set({noteSocket: null, isConnected: false})
+        }
+    }
 }))
