@@ -1,13 +1,26 @@
 import './App.css'
 import Main from './page/main/Main'
-import {Qna, Notice} from './page/board'
-import {Login, MyPage, SignIn} from './page/member'
-import {Routes, Route} from 'react-router-dom'
-import {Container, Row, Col, Navbar, Nav} from 'react-bootstrap'
-import {useState} from 'react'
+import { Qna, Notice } from './page/board'
+import { Login, MyPage, SignIn } from './page/member'
+import { Routes, Route } from 'react-router-dom'
+import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
+import { useEffect, useState } from 'react'
+import RegisterPage from './page/member/RegisterPage'
+import { useAuthStore } from './store/useAuthStore'
 
 function App() {
   const [expanded, setExpanded] = useState(false)
+
+  const {token,initialize, logout } = useAuthStore();
+  useEffect(() => {
+      initialize();
+  }, [])
+
+  const handleLogout = () => {
+  logout();
+    window.location.href = '/'
+  }
+
 
   return (
     <Container fluid className="App p-0">
@@ -22,8 +35,18 @@ function App() {
               <Nav.Link href="/notice/list">공지사항</Nav.Link>
               <Nav.Link href="/qna/list">QNA</Nav.Link>
               <Nav.Link href="/guide">이용가이드</Nav.Link>
-              <Nav.Link href="/mypage">마이페이지</Nav.Link>
-              <Nav.Link href="/login">로그인</Nav.Link>
+
+              {token ? (
+                <>
+                  <Nav.Link href="/mypage">마이페이지</Nav.Link>
+                  <Nav.Link onClick={handleLogout}>로그아웃</Nav.Link>
+                </>
+              ) : (
+                <>
+                  <Nav.Link href="/login">로그인</Nav.Link>
+                  <Nav.Link href="/RegisterPage">회원가입</Nav.Link>
+                </>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -37,6 +60,8 @@ function App() {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/notice/*" element={<Notice />} />
           <Route path="/qna/*" element={<Qna />} />
+          <Route path="/RegisterPage/*" element={<RegisterPage />} />
+
         </Routes>
       </main>
 
