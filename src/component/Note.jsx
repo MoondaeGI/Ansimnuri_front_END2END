@@ -58,14 +58,14 @@ export const Note = ({dto}) => {
                     <span className="badge bg-secondary">#{id}</span>
                     <small className="text-muted">{date}</small>
                 </div>
-                <p className="card-text mb-3">{content}</p>
+                <h1 className="card-text mb-3">{content}</h1>
                 <div className="mb-2">
                     <small className="text-muted me-2">작성자: {nickname}</small>
                     <small className="text-muted">추천: {recCount}</small>
                 </div>
                 <div className="d-flex justify-content-end mb-3">
-                    <Button className="btn btn-outline-primary btn-sm me-2" onClick={update}>수정</Button>
-                    <Button className="btn btn-outline-secondary btn-sm" onClick={toggleUpdateForm}>돌아가기</Button>
+                    <Button className="btn btn-outline-primary btn-sm me-2" onClick={toggleUpdateForm}>수정</Button>
+                    <Button className="btn btn-outline-secondary btn-sm" onClick={deleteById}>삭제</Button>
                 </div>
             </>
         );
@@ -87,8 +87,8 @@ export const Note = ({dto}) => {
                     />
                 </div>
                 <div className="d-flex justify-content-end mb-3">
-                    <Button className="btn btn-primary btn-sm me-2" onClick={toggleUpdateForm}>수정</Button>
-                    <Button className="btn btn-danger btn-sm" onClick={deleteById}>삭제</Button>
+                    <Button className="btn btn-primary btn-sm me-2" onClick={update}>수정완료</Button>
+                    <Button className="btn btn-danger btn-sm" onClick={toggleUpdateForm}>돌아가기</Button>
                 </div>
             </>
         )
@@ -96,24 +96,25 @@ export const Note = ({dto}) => {
 
     return (
         <div className="note-wrapper">
-            <div className="card shadow-sm">
+            <div className="card post-it-note">
                 <div className="card-body">
                     {isUpdate ? updateNote() : noteContent()}
 
-                    <hr className="my-3" />
+                    <hr className="note-divider" />
 
                     <div className="reply-section">
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h6 className="card-title mb-0">댓글 {replyCount}개</h6>
-                            <Button className="btn btn-outline-secondary btn-sm" onClick={openReply}>열기</Button>
+                            <Button className="btn btn-outline-secondary btn-sm" onClick={openReply}>
+                                열기
+                            </Button>
                         </div>
                         <div className="reply-list mb-3">{replyList}</div>
                         <div className="mb-3">
-                            <textarea className="form-control" rows="2" placeholder="댓글을 입력하세요..."></textarea>
+                            <textarea className="form-control note-textarea" rows="2" placeholder="댓글을 입력하세요..."></textarea>
                         </div>
                         <div className="d-flex justify-content-end">
                             <Button className="btn btn-primary btn-sm me-2">등록</Button>
-                            <Button className="btn btn-outline-secondary btn-sm">삭제</Button>
                         </div>
                     </div>
                 </div>
