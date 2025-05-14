@@ -1,4 +1,5 @@
-import { Note, NoteReply } from "../../../component";
+import { Note } from "../../../component";
+import {useNoteStore} from "../../../store/useNoteStore";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 //import MapGL from 'react-map-gl';
 import { Map as MapGL } from 'react-map-gl/mapbox';
@@ -8,7 +9,8 @@ import { SearchBox } from '@mapbox/search-js-react';
 import axios from 'axios';
 
 export const Map = () => {
-  const [noteList, setNoteList] = useState([]);
+  const [noteList, setNoteList] =
+      useNoteStore(state => [state.noteList, state.setNoteList]);
   
   useEffect(() => {
     axios.get("http://localhost/api/note")

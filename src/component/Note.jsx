@@ -12,13 +12,36 @@ export const Note = ({dto}) => {
         content: content,
         userId: userId
     })
+    const [replyList, setReplyList] = useState([])
 
     function update(e) {
         e.preventDefault();
+        axios.put('http://localhost/api/note', form)
+            .then(res => {
+                console.log(res)
+            })
     }
 
     function deleteById(e) {
         e.preventDefault();
+        axios.delete('http://localhost/api/note/' + id)
+            .then(res => {
+                console.log(res)
+            })
+    }
+
+    function openReply(e) {
+        e.preventDefault();
+
+        axios.get('http://localhost/api/note/reply/' + id)
+            .then(res => {
+                console.log(res)
+                setReplyList(prev =>
+                    res.data.map(reply =>
+                        <NoteReply key={reply.id} dto={reply} />)
+                )
+            })
+            .catch(ignore => {})
     }
 
     return (
@@ -39,6 +62,13 @@ export const Note = ({dto}) => {
             </form>
             <div>
                 <div>
+                    <h4>댓글</h4>
+                    <div>
+                        <Button onClick={openReply}>열기</Button>
+                    </div>
+                    <div>{replyList}</div>
+                </div>
+                <div>
                     <textarea></textarea>
                 </div>
                 <div>
@@ -46,34 +76,6 @@ export const Note = ({dto}) => {
                     <Button>삭제</Button>
                 </div>
             </div>
-        </div>
-    )
-}
-
-export const EmptyNote = ({latitude, longitude}) => {
-    const [form, setForm] = useState({
-        latitude: latitude,
-        longitude: longitude,
-        content: ''
-    })
-
-    const save = (e) => {
-        e.preventDefault();
-        axios.post('http://localhost/api/note', form)
-            .then(res => {
-                console.log(res)
-            })
-    }
-
-    return (
-        <div>
-            <form>
-                <textarea name="content"></textarea>
-                <div>
-                    <Button onClick={save}>등록</Button>
-                    <Button oncClick={back}>취소</Button>
-                </div>
-            </form>
         </div>
     )
 }
@@ -104,6 +106,38 @@ export const NoteReply = ({dto}) => {
                 <Button onClick={update()}>수정</Button>
                 <Button onClick={deleteById()}>삭제</Button>
             </div>
+        </div>
+    )
+}
+
+export const EmptyNote = ({latitude, longitude}) => {
+    const [form, setForm] = useState({
+        latitude: latitude,
+        longitude: longitude,
+        content: ''
+    })
+
+    const save = (e) => {
+        e.preventDefault();
+        axios.post('http://localhost/api/note', form)
+            .then(res => {
+                console.log(res)
+            })
+    }
+
+    const back = (e) => {
+        e.preventDefault();
+    }
+
+    return (
+        <div>
+            <form>
+                <textarea name="content"></textarea>
+                <div>
+                    <Button onClick={save}>등록</Button>
+                    <Button oncClick={back}>취소</Button>
+                </div>
+            </form>
         </div>
     )
 }
