@@ -1,6 +1,6 @@
 import {Button as B} from "react-bootstrap";
 
-export const Button = ({name, className, ...props}) => {
-    const customClassName = `${className}`
-    return <B className={customClassName} {...props}>{name}</B>
-} 
+export const Button = ({children, className: _className, ...props}) => {
+    const customClass = `${_className}`
+    return <B className={customClass} {...props}>{children}</B>
+}

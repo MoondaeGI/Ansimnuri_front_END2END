@@ -6,18 +6,21 @@ import { Routes, Route } from 'react-router-dom'
 import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/useAuthStore'
-import { Note } from './component'
+import { useNoteStore } from './store/useNoteStore'
 
 function App() {
   const [expanded, setExpanded] = useState(false)
 
   const {token,initialize, logout } = useAuthStore();
+  const {disconnect} = useNoteStore();
+
   useEffect(() => {
       initialize();
   }, [])
 
   const handleLogout = () => {
-  logout();
+    logout();
+    disconnect();
     window.location.href = '/'
   }
 

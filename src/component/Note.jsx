@@ -1,5 +1,5 @@
 import {parseDate} from "../util";
-import {Button} from "react-bootstrap";
+import {Button} from "../component";
 import {useState} from "react";
 import axios from "axios";
 import "./css/Note.css";
@@ -59,18 +59,15 @@ export const Note = ({dto}) => {
                     <small className="text-muted">{date}</small>
                 </div>
                 <p className="card-text mb-3">{content}</p>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <small className="text-muted me-2">작성자: {nickname}</small>
-                        <small className="text-muted">추천: {recCount}</small>
-                    </div>
-                    <div>
-                        <Button className="btn btn-outline-primary btn-sm me-2" onClick={update}>수정</Button>
-                        <Button className="btn btn-outline-secondary btn-sm" onClick={toggleUpdateForm}>돌아가기</Button>
-                    </div>
+                <div className="mb-2">
+                    <small className="text-muted me-2">작성자: {nickname}</small>
+                    <small className="text-muted">추천: {recCount}</small>
+                </div>
+                <div className="d-flex justify-content-end mb-3">
+                    <Button className="btn btn-outline-primary btn-sm me-2" onClick={update}>수정</Button>
+                    <Button className="btn btn-outline-secondary btn-sm" onClick={toggleUpdateForm}>돌아가기</Button>
                 </div>
             </>
-
         );
     }
 
