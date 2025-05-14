@@ -13,6 +13,12 @@ export const Note = ({dto}) => {
         userId: userId
     })
     const [replyList, setReplyList] = useState([])
+    const [isUpdate, setIsUpdate] = useState(false)
+
+    function toggleUpdateForm(e) {
+        e.preventDefault();
+        setIsUpdate(!isUpdate)
+    }
 
     function update(e) {
         e.preventDefault();
@@ -44,8 +50,8 @@ export const Note = ({dto}) => {
             .catch(ignore => {})
     }
 
-    return (
-        <div className="">
+    const noteContent = () => {
+        return (
             <form>
                 <div>
                     <div>{id}</div>
@@ -56,13 +62,36 @@ export const Note = ({dto}) => {
                     <div>{date}</div>
                 </div>
                 <div>
-                    <Button onClick={update()}>수정</Button>
-                    <Button onClick={deleteById()}>삭제</Button>
+                    <Button onClick={update}>수정</Button>
+                    <Button onClick={toggleUpdateForm}>돌아가기</Button>
                 </div>
             </form>
+        );
+    }
+
+    const updateNote = () => {
+        return (
+            <form>
+                <div>
+                    <div>{id}</div>
+                    <div>
+                        <textarea name="content">{form.content}</textarea>
+                    </div>
+                </div>
+                <div>
+                    <Button onClick={toggleUpdateForm}>수정</Button>
+                    <Button onClick={deleteById}>삭제</Button>
+                </div>
+            </form>
+        )
+    }
+
+    return (
+        <div className="">
+            {isUpdate ? updateNote() : noteContent()}
             <div>
                 <div>
-                    <h4>댓글</h4>
+                    <h4>댓글 {replyCount}개</h4>
                     <div>
                         <Button onClick={openReply}>열기</Button>
                     </div>
@@ -103,8 +132,8 @@ export const NoteReply = ({dto}) => {
                 <div>{date}</div>
             </div>
             <div>
-                <Button onClick={update()}>수정</Button>
-                <Button onClick={deleteById()}>삭제</Button>
+                <Button onClick={update}>수정</Button>
+                <Button onClick={deleteById}>삭제</Button>
             </div>
         </div>
     )

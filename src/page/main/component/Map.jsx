@@ -7,17 +7,21 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import { SearchBox } from '@mapbox/search-js-react';
 import axios from 'axios';
+import { useMemo } from "react";
 
 export const Map = () => {
-  const [noteList, setNoteList] =
-      useNoteStore(state => [state.noteList, state.setNoteList]);
-  
+  const {noteList, setNoteList} = useNoteStore()
+
   useEffect(() => {
-    axios.get("http://localhost/api/note")
-      .then(res => {
-        setNoteList(res.data.map(dto => <Note dto={dto} />));
-      });
-  }, []);
+    axios.get('http://localhost:80/api/note')
+    .then(resp => {
+      setNoteList(resp.data)
+    })
+  }, [])
+
+  const noteComponentList = useMemo(() => {
+    return noteList.map((note, index) => <Note key={index} dto={note} />)
+  }, [noteList])
 
   const SEOUL_BOUNDS = {
     minLng: 126.764,
@@ -264,8 +268,10 @@ export const Map = () => {
   return (
     <div>
       <SeoulMap3D />
+      <div>
+        {noteComponentList}
+      </div>
       <div style={{ margin: '20px auto', maxWidth: '800px' }}>
-        {noteList}
       </div>
     </div>
   );

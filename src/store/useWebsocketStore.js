@@ -19,5 +19,9 @@ export const useWebsocketStore = create(set => ({
         if (get().noteSocket) {
             set({noteSocket: null, isConnected: false})
         }
+    },
+
+    getMessage: () => {
+        
     }
 }))

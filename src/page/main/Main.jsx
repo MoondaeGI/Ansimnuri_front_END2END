@@ -15,7 +15,7 @@ const Main = () => {
           </div>
 
           <div className="newsList">
-            <News/>
+           <News/>
           </div>
         </div>
 

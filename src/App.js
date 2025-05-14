@@ -7,6 +7,7 @@ import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
 import { useEffect, useState } from 'react'
 import RegisterPage from './page/member/RegisterPage'
 import { useAuthStore } from './store/useAuthStore'
+import { Note } from './component'
 
 function App() {
   const [expanded, setExpanded] = useState(false)
@@ -62,7 +63,7 @@ function App() {
           <Route path="/qna/*" element={<Qna />} />
           <Route path="/RegisterPage/*" element={<RegisterPage />} />
 
-        </Routes>
+        </Routes> 
       </main>
 
       {/* Footer */}
