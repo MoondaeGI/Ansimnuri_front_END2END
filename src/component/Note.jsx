@@ -4,7 +4,7 @@ import {useState} from "react";
 import axios from "axios";
 
 export const Note = ({dto}) => {
-    const {id, content, userId, nickname, latitude, longitude, regDate, recCount, replyCount} = dto
+    const {id, content, userId, nickname, regDate, recCount, replyCount} = dto
     const date = parseDate(regDate)
 
     const [form, setForm] = useState({
@@ -75,7 +75,7 @@ export const Note = ({dto}) => {
                 <div>
                     <div>{id}</div>
                     <div>
-                        <textarea name="content">{form.content}</textarea>
+                        <textarea name="content" value={form.content}>{form.content}</textarea>
                     </div>
                 </div>
                 <div>
