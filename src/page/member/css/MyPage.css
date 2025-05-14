@@ -1,0 +1,90 @@
+/* Container for the entire MyPage */
+.mypage-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header styling */
+.mypage-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #2c3e50;
+}
+
+/* Box containing user information */
+.info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Labels for user information */
+.info-box p {
+  margin: 0;
+  font-size: 16px;
+  color: #34495e;
+}
+
+/* Strong tags within paragraphs */
+.info-box p strong {
+  display: inline-block;
+  width: 120px;
+  color: #2c3e50;
+}
+
+/* Input fields */
+.info-box input {
+  padding: 8px 10px;
+  margin-left: 10px;
+  border: 1px solid #bdc3c7;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 60%;
+}
+
+/* Buttons */
+.info-box button {
+  padding: 8px 16px;
+  margin-top: 10px;
+  margin-right: 10px;
+  background-color: #3498db !important;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+.info-box button:hover {
+  background-color: #2980b9;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+  .mypage-container {
+    padding: 20px;
+  }
+
+  .info-box input {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 5px;
+  }
+
+  .info-box p {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-box p strong {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
