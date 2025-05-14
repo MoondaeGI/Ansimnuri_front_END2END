@@ -2,6 +2,7 @@ import {parseDate} from "../util";
 import {Button} from "react-bootstrap";
 import {useState} from "react";
 import axios from "axios";
+import "./css/Note.css";
 
 export const Note = ({dto}) => {
     const {id, content, userId, nickname, regDate, recCount, replyCount} = dto
@@ -52,57 +53,72 @@ export const Note = ({dto}) => {
 
     const noteContent = () => {
         return (
-            <form>
-                <div>
-                    <div>{id}</div>
-                    <div>{content}</div>
-                    <div>{userId}</div>
-                    <div>{recCount}</div>
-                    <div>{nickname}</div>
-                    <div>{date}</div>
+            <>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                    <span className="badge bg-secondary">#{id}</span>
+                    <small className="text-muted">{date}</small>
                 </div>
-                <div>
-                    <Button onClick={update}>수정</Button>
-                    <Button onClick={toggleUpdateForm}>돌아가기</Button>
+                <p className="card-text mb-3">{content}</p>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <small className="text-muted me-2">작성자: {nickname}</small>
+                        <small className="text-muted">추천: {recCount}</small>
+                    </div>
+                    <div>
+                        <Button className="btn btn-outline-primary btn-sm me-2" onClick={update}>수정</Button>
+                        <Button className="btn btn-outline-secondary btn-sm" onClick={toggleUpdateForm}>돌아가기</Button>
+                    </div>
                 </div>
-            </form>
+            </>
+
         );
     }
 
     const updateNote = () => {
         return (
-            <form>
-                <div>
-                    <div>{id}</div>
-                    <div>
-                        <textarea name="content" value={form.content}>{form.content}</textarea>
-                    </div>
+            <>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                    <span className="badge bg-secondary">#{id}</span>
                 </div>
-                <div>
-                    <Button onClick={toggleUpdateForm}>수정</Button>
-                    <Button onClick={deleteById}>삭제</Button>
+                <div className="mb-3">
+                    <textarea
+                        className="form-control"
+                        name="content"
+                        value={form.content}
+                        onChange={(e) => setForm({...form, content: e.target.value})}
+                        rows="3"
+                    />
                 </div>
-            </form>
+                <div className="d-flex justify-content-end mb-3">
+                    <Button className="btn btn-primary btn-sm me-2" onClick={toggleUpdateForm}>수정</Button>
+                    <Button className="btn btn-danger btn-sm" onClick={deleteById}>삭제</Button>
+                </div>
+            </>
         )
     }
 
     return (
-        <div className="">
-            {isUpdate ? updateNote() : noteContent()}
-            <div>
-                <div>
-                    <h4>댓글 {replyCount}개</h4>
-                    <div>
-                        <Button onClick={openReply}>열기</Button>
+        <div className="note-wrapper">
+            <div className="card shadow-sm">
+                <div className="card-body">
+                    {isUpdate ? updateNote() : noteContent()}
+
+                    <hr className="my-3" />
+
+                    <div className="reply-section">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h6 className="card-title mb-0">댓글 {replyCount}개</h6>
+                            <Button className="btn btn-outline-secondary btn-sm" onClick={openReply}>열기</Button>
+                        </div>
+                        <div className="reply-list mb-3">{replyList}</div>
+                        <div className="mb-3">
+                            <textarea className="form-control" rows="2" placeholder="댓글을 입력하세요..."></textarea>
+                        </div>
+                        <div className="d-flex justify-content-end">
+                            <Button className="btn btn-primary btn-sm me-2">등록</Button>
+                            <Button className="btn btn-outline-secondary btn-sm">삭제</Button>
+                        </div>
                     </div>
-                    <div>{replyList}</div>
-                </div>
-                <div>
-                    <textarea></textarea>
-                </div>
-                <div>
-                    <Button>등록</Button>
-                    <Button>삭제</Button>
                 </div>
             </div>
         </div>

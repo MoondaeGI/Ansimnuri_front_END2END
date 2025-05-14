@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/RegisterPage.css';
 
-const RegisterPage = () => {
+export const RegisterPage = () => {
   const navi = useNavigate();
 
   const [form, setForm] = useState({
@@ -271,5 +271,3 @@ const RegisterPage = () => {
     </div>
   );
 };
-
-export default RegisterPage;

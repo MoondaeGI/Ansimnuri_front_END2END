@@ -1,11 +1,10 @@
 import './App.css'
 import Main from './page/main/Main'
 import { Qna, Notice } from './page/board'
-import { Login, MyPage, SignIn } from './page/member'
+import { Login, MyPage, RegisterPage } from './page/member'
 import { Routes, Route } from 'react-router-dom'
 import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
 import { useEffect, useState } from 'react'
-import RegisterPage from './page/member/RegisterPage'
 import { useAuthStore } from './store/useAuthStore'
 import { Note } from './component'
 
