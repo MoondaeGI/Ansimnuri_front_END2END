@@ -7,8 +7,8 @@ import { useAuthStore, useNoteStore } from '../../store';
 export const Login = () => {
   const [form, setForm] = useState({ loginId: '', password: '' });
   const navigate = useNavigate();
-const { setAuth, token } = useAuthStore();
-const {connect} = useNoteStore();
+  const { setAuth, token } = useAuthStore();
+  const {connect} = useNoteStore();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -17,17 +17,16 @@ const {connect} = useNoteStore();
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost/api/member/login', form);
+      const id = response.data.id;
+      const token = response.data.token;
 
-      setAuth(response.data);
+      setAuth(token, id);
       connect(token)
-
-
       alert('로그인 성공');
-
       navigate('/');
 
     } catch (err) {
-     console.error("로그인 실패:", err.response?.data || err.message);
+      console.error("로그인 실패:", err.response?.data || err.message);
       alert('아이디와 비밀번호를 확인해주세요');
     }
   };
@@ -37,34 +36,34 @@ const {connect} = useNoteStore();
   };
 
   return (
-    <div className="login-container">
-      <h2>로그인</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>아이디</label>
-          <input
-            type="text"
-            name="loginId"
-            value={form.loginId}
-            onChange={handleChange}
-            placeholder="아이디를 입력하세요"
-          />
-        </div>
-        <div>
-          <label>비밀번호</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="비밀번호를 입력하세요"
-          />
-        </div>
-        <div>
-          <button type="submit">로그인</button>
-          <button type="button" onClick={handleRegister}>회원가입</button>
-        </div>
-      </form>
-    </div>
+      <div className="login-container">
+        <h2>로그인</h2>
+        <form onSubmit={handleLogin}>
+          <div>
+            <label>아이디</label>
+            <input
+                type="text"
+                name="loginId"
+                value={form.loginId}
+                onChange={handleChange}
+                placeholder="아이디를 입력하세요"
+            />
+          </div>
+          <div>
+            <label>비밀번호</label>
+            <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="비밀번호를 입력하세요"
+            />
+          </div>
+          <div>
+            <button type="submit">로그인</button>
+            <button type="button" onClick={handleRegister}>회원가입</button>
+          </div>
+        </form>
+      </div>
   );
 };
