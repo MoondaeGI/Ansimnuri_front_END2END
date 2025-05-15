@@ -9,7 +9,7 @@ import axios from 'axios';
 
 export const Map = () => {
   const [noteList, setNoteList] = useState([]);
-  
+
   useEffect(() => {
     axios.get("http://localhost/api/note")
       .then(res => {
@@ -44,100 +44,79 @@ export const Map = () => {
 
     const toGeoJSON = items => ({
       type: 'FeatureCollection',
-      features: items.map(i => ({
+      features: items.map(p => ({
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [parseFloat(i.경도), parseFloat(i.위도)]
+          coordinates: [p.longitude, p.latitude]
         },
-        properties: { id: i.관리번호 }
+        properties: { id: p.id, name: p.name }
       }))
     });
 
-    // 지도 이동 범위 제한 함수
-    const constrainView = (viewState) => {
-      const constrained = { ...viewState };
-      
-      if (constrained.longitude < SEOUL_BOUNDS.minLng) {
-        constrained.longitude = SEOUL_BOUNDS.minLng;
-      } else if (constrained.longitude > SEOUL_BOUNDS.maxLng) {
-        constrained.longitude = SEOUL_BOUNDS.maxLng;
-      }
-      
-      if (constrained.latitude < SEOUL_BOUNDS.minLat) {
-        constrained.latitude = SEOUL_BOUNDS.minLat;
-      } else if (constrained.latitude > SEOUL_BOUNDS.maxLat) {
-        constrained.latitude = SEOUL_BOUNDS.maxLat;
-      }
-      
-      if (constrained.zoom < 10) constrained.zoom = 10;
-      if (constrained.zoom > 18) constrained.zoom = 18;
-      
-      return constrained;
-    };
-
-    const calculatePitch = useCallback((zoom) => {
-      const minZoom = 11;
-      const maxZoom = 16;
-      const maxPitch = 60;
-
-      if (zoom <= minZoom) return 0;
-      if (zoom >= maxZoom) return maxPitch;
-      return ((zoom - minZoom) / (maxZoom - minZoom)) * maxPitch;
+    useEffect(() => {
+      axios.get("http://localhost/api/map/police").then((resp => {
+        console.log(resp);
+        setStreetlights(resp.data);
+      }))
     }, []);
 
-    const handleMove = useCallback((evt) => {
-      const { zoom } = evt.viewState;
-      const newPitch = calculatePitch(zoom);
-      
-      const constrainedView = constrainView({
-        ...evt.viewState,
-        pitch: newPitch
-      });
-      
-      setViewState(constrainedView);
+    const constrainView = vs => {
+      const c = { ...vs };
+      if (c.longitude < SEOUL_BOUNDS.minLng) c.longitude = SEOUL_BOUNDS.minLng;
+      if (c.longitude > SEOUL_BOUNDS.maxLng) c.longitude = SEOUL_BOUNDS.maxLng;
+      if (c.latitude < SEOUL_BOUNDS.minLat) c.latitude = SEOUL_BOUNDS.minLat;
+      if (c.latitude > SEOUL_BOUNDS.maxLat) c.latitude = SEOUL_BOUNDS.maxLat;
+      if (c.zoom < 10) c.zoom = 10;
+      if (c.zoom > 18) c.zoom = 18;
+      return c;
+    };
+    const calculatePitch = useCallback(z => {
+      if (z <= 11) return 0;
+      if (z >= 16) return 60;
+      return ((z - 11) / (16 - 11)) * 60;
+    }, []);
+    const handleMove = useCallback(evt => {
+      const pitch = calculatePitch(evt.viewState.zoom);
+      setViewState(constrainView({ ...evt.viewState, pitch }));
     }, [calculatePitch]);
 
+    // 검색박스 선택
     const handleSearchSelect = useCallback(({ result }) => {
       if (!result?.geometry) return;
       const [lon, lat] = result.geometry.coordinates;
-      setViewState(vs => ({
-        ...vs,
-        longitude: lon,
-        latitude: lat,
-        zoom: 14,
-        pitch: 45
-      }));
+      setViewState({ longitude: lon, latitude: lat, zoom: 14, pitch: 45, bearing: 0 });
     }, []);
 
     const onMapLoad = useCallback((e) => {
       const map = mapRef.current?.getMap();
       if (!map || map.getLayer('3d-buildings')) return;
-      
-      map.addControl(new MapboxLanguage({ defaultLanguage: 'ko', supportedLanguages: ['ko','en'] }));
 
-      map.addSource('streetlights', {
+      map.addControl(new MapboxLanguage({ defaultLanguage: 'ko', supportedLanguages: ['ko', 'en'] }));
+
+      map.addSource('police-stations', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] }
       });
-      
+
       map.addLayer({
-        id: 'streetlight-layer',
+        id: 'police-layer',
         type: 'circle',
-        source: 'streetlights',
+        source: 'police-stations',
         layout: { visibility: showLights ? 'visible' : 'none' },
-        paint: { 'circle-radius': 6, 'circle-color': '#FFD700' }
+        paint: {
+          'circle-radius': 8,
+          'circle-color': '#4287f5',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#fff'
+        }
       });
 
       // 3D 건물 레이어
       if (map.getSource('composite')) {
         map.addLayer({
-          'id': '3d-buildings',
-          'source': 'composite',
-          'source-layer': 'building',
-          'filter': ['has', 'height'],
-          'type': 'fill-extrusion',
-          'minzoom': 12,
+          'id': '3d-buildings', 'source': 'composite', 'source-layer': 'building',
+          'filter': ['has', 'height'], 'type': 'fill-extrusion', 'minzoom': 12,
           'paint': {
             'fill-extrusion-color': '#aaa',
             'fill-extrusion-height': ['get', 'height'],
@@ -161,17 +140,17 @@ export const Map = () => {
       }
 
       setTimeout(() => {
-      const layers = map.getStyle().layers;
-      layers.forEach(layer => {
-        if (layer.type === 'symbol' && layer.layout?.['text-field']) {
-          map.setLayoutProperty(
-            layer.id, 
-            'text-field', 
-            ['coalesce', ['get', 'name_ko'], ['get', 'name']]
-          );
-        }
-      });
-    }, 1000);
+        const layers = map.getStyle().layers;
+        layers.forEach(layer => {
+          if (layer.type === 'symbol' && layer.layout?.['text-field']) {
+            map.setLayoutProperty(
+              layer.id,
+              'text-field',
+              ['coalesce', ['get', 'name_ko'], ['get', 'name']]
+            );
+          }
+        });
+      }, 1000);
 
 
       // 지도 이동 제한 설정
@@ -183,21 +162,14 @@ export const Map = () => {
 
     useEffect(() => {
       const map = mapRef.current?.getMap();
-      if (map && map.getSource('streetlights')) {
-        map.getSource('streetlights').setData(toGeoJSON(streetlights));
-      }
-    }, [streetlights]);
-    
-    useEffect(() => {
-      const map = mapRef.current?.getMap();
-      if (map && map.getLayer('streetlight-layer')) {
-        map.setLayoutProperty(
-          'streetlight-layer',
-          'visibility',
-          showLights ? 'visible' : 'none'
-        );
-      }
-    }, [showLights]);
+      if (!map || !map.getSource('police-stations')) return;
+      map.getSource('police-stations').setData(toGeoJSON(streetlights));
+      map.setLayoutProperty(
+        'police-layer',
+        'visibility',
+        showLights ? 'visible' : 'none'
+      );
+    }, [streetlights, showLights]);
 
     const toggleView = useCallback(() => {
       setViewState(prev => constrainView({
@@ -234,8 +206,8 @@ export const Map = () => {
           minZoom={10}
           maxZoom={18}
         />
-        
-        <button 
+
+        <button
           onClick={toggleView}
           style={{
             position: 'absolute', top: 50, right: 10, zIndex: 1,
@@ -245,16 +217,17 @@ export const Map = () => {
           }}>
           {viewState.pitch > 0 ? '2D 보기' : '3D 보기'}
         </button>
-
         <button
           onClick={() => setShowLights(v => !v)}
           style={{
-            position: 'absolute', top: 100, right: 10, zIndex: 1,
-            padding: '8px', background: '#fff', border: '1px solid #ddd'
+            position: 'absolute', top: 10, right: 10, zIndex: 1,
+            padding: '8px 12px', background: '#fff', border: '1px solid #ddd',
+            cursor: 'pointer'
           }}
         >
-          {showLights ? '지구대 숨기기' : '지구대 보기(미구현)'}
+          {showLights ? '지구대 숨기기' : '지구대 보기'}
         </button>
+
       </div>
     );
   };
