@@ -4,16 +4,16 @@ export const useNoteStore = create((set, get) => ({
     socket: null,
     noteList: [],
 
-    initialize: (token) => {
+    initialize: () => {
         const noteList = sessionStorage.getItem('noteList')
         if(noteList) {
             set({noteList: noteList})
         }
 
         if (!get().socket) {
-            console.log('connect')
-            const ws = new WebSocket(`ws://localhost:80/ws/note/${token}`)
+            const ws = new WebSocket(`ws://localhost:80/ws/note`)
             ws.onopen = () => {
+                console.log('connect')
                 set({socket: ws})
             }
         }
@@ -24,10 +24,10 @@ export const useNoteStore = create((set, get) => ({
         sessionStorage.setItem('noteList', noteList)
     },
 
-    connect: (token) => {
-        console.log('connect')
-        const ws = new WebSocket(`ws://localhost:80/ws/note/${token}`)
+    connect: () => {
+        const ws = new WebSocket(`ws://localhost:80/ws/note`)
         ws.onopen = () => {
+            console.log('connect')
             set({socket: ws})
         }
     },

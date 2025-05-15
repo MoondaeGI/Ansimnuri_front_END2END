@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/Login.css';
-import { useAuthStore, useNoteStore } from '../../store';
+import { useAuthStore } from '../../store';
 
 export const Login = () => {
   const [form, setForm] = useState({ loginId: '', password: '' });
   const navigate = useNavigate();
   const { setAuth, token } = useAuthStore();
-  const {connect} = useNoteStore();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -21,7 +20,6 @@ export const Login = () => {
       const token = response.data.token;
 
       setAuth(token, id);
-      connect(token)
       alert('로그인 성공');
       navigate('/');
 

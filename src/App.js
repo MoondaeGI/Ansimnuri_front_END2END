@@ -11,15 +11,15 @@ function App() {
   const [expanded, setExpanded] = useState(false)
 
   const {token,initialize, logout } = useAuthStore();
-  const {disconnect} = useNoteStore();
+  const {connect} = useNoteStore();
 
   useEffect(() => {
       initialize();
+      connect();
   }, [])
 
   const handleLogout = () => {
     logout();
-    disconnect();
     window.location.href = '/'
   }
 
