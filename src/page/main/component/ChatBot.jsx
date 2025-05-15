@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// ChatBot.jsx
+import React, { useState, useRef, useEffect } from "react";
 import "./css/ChatBot.css";
 
 export const ChatBot = () => {
@@ -7,6 +8,13 @@ export const ChatBot = () => {
   const [selectedMainMenu, setSelectedMainMenu] = useState(null);
   const [selectedSubMenu, setSelectedSubMenu] = useState(null);
   const [policeSearchMode, setPoliceSearchMode] = useState(false);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatLog]);
 
   const menuOptions = [
     "지구대 / 경찰서 안내",
@@ -197,6 +205,7 @@ export const ChatBot = () => {
             {msg.content}
           </div>
         ))}
+        <div ref={chatEndRef} />
       </div>
 
       <div className="input-area">
