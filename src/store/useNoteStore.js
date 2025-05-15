@@ -9,6 +9,14 @@ export const useNoteStore = create((set, get) => ({
         if(noteList) {
             set({noteList: noteList})
         }
+
+        if (!get().socket) {
+            const ws = new WebSocket(`ws://localhost:80/ws/note`)
+            ws.onopen = () => {
+                console.log('connect')
+                set({socket: ws})
+            }
+        }
     },
 
     setNoteList: (noteList) => {
@@ -16,9 +24,10 @@ export const useNoteStore = create((set, get) => ({
         sessionStorage.setItem('noteList', noteList)
     },
 
-    connect: (token) => {
-        const ws = new WebSocket(`ws://localhost:80/note/${token}`)
+    connect: () => {
+        const ws = new WebSocket(`ws://localhost:80/ws/note`)
         ws.onopen = () => {
+            console.log('connect')
             set({socket: ws})
         }
     },
@@ -31,24 +40,26 @@ export const useNoteStore = create((set, get) => ({
         get().socket.onmessage = (event) => {
             const {requestType, requesterId, noteDTO} = event.data
             console.log(requestType, requesterId, noteDTO)
+
+            switch (requestType) {
+                case 'INSERT':
+                    set(prev => ({
+                        noteList: [...prev.noteList, noteDTO]
+                    }))
+                    break
+                case 'UPDATE':
+                    set(prev => ({
+                        noteList: prev.noteList
+                            .map(note => (note.id === noteDTO.id) ? noteDTO : note)
+                    }))
+                    break
+                case 'DELETE':
+                    set(prev => ({
+                        noteList: prev.noteList
+                            .filter(note => note.id !== noteDTO.id)
+                    }))
+                    break
+            }
         }
-    },
-
-    insert: (dto) => {
-        set(prev => ({
-            noteList: [...prev.noteList, dto]
-        }))
-    },
-
-    update: (dto) => {
-        set(prev => ({
-            noteList: prev.noteList.map(note => (note.id == dto.id) ? dto : note)
-        }))
-    },
-
-    delete: (dto) => {
-        set(prev => ({
-            noteList: prev.noteList.filter(note => note.id != dto.id)
-        }))
     }
 }))
