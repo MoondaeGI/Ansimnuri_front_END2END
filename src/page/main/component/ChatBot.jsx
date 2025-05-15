@@ -56,7 +56,7 @@ export const ChatBot = () => {
 console.log("💡 selectedMainMenu:", selectedMainMenu);
     if (selectedMainMenu === "지구대 / 경찰서 안내") {
       try {
-        const res = await fetch(`http://localhost:80/chatBot/police?keyword=${encodeURIComponent(input)}`);        //const res = await fetch(`http://localhost:80/chatBot/police?keyword=역삼동`);
+        const res = await fetch(`http://localhost:80/chatBot/police?keyword=${encodeURIComponent(input)}`);
         const policeData = await res.json();
 
         const gptPrompt = `
