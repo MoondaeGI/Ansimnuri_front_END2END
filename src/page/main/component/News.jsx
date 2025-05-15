@@ -19,12 +19,12 @@ export const News = () => {
         {newsList.map((article, index) => (
           <div className="newsCard" key={index}>
             <div className="newsImgWrapper">
-              <img src={article.content} alt="뉴스 썸네일" className="newsImg"/>
+              <p className="newsImg">{article.title}</p>
             </div>
             <div className="newsContent">
               <h3 className="newsTitle">
                 <a href={article.url} className="newsTitleLink" target="_blank" rel="noopener noreferrer">
-                  {article.thumbnailImg}
+                  {article.description}
                 </a>
               </h3>
               <p className="newsDate">{new Date(article.regDate).toLocaleString()}</p>

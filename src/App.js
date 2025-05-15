@@ -5,22 +5,21 @@ import { Login, MyPage, RegisterPage } from './page/member'
 import { Routes, Route } from 'react-router-dom'
 import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
 import { useEffect, useState } from 'react'
-import { useAuthStore } from './store/useAuthStore'
-import { useNoteStore } from './store/useNoteStore'
+import { useAuthStore, useNoteStore } from './store'
 
 function App() {
   const [expanded, setExpanded] = useState(false)
 
   const {token,initialize, logout } = useAuthStore();
-  const {disconnect} = useNoteStore();
+  const {connect} = useNoteStore();
 
   useEffect(() => {
       initialize();
+      connect();
   }, [])
 
   const handleLogout = () => {
     logout();
-    disconnect();
     window.location.href = '/'
   }
 
