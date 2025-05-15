@@ -5,6 +5,7 @@ export const ChatBot = () => {
   const [chatLog, setChatLog] = useState([]);
   const [question, setQuestion] = useState("");
   const [selectedMainMenu, setSelectedMainMenu] = useState(null);
+  const [policeSearchMode, setPoliceSearchMode] = useState(false);
 
   const menuOptions = [
     "지구대 / 경찰서 안내",
@@ -52,48 +53,23 @@ export const ChatBot = () => {
     setChatLog(updated);
     setQuestion("");
 
-
-console.log("💡 selectedMainMenu:", selectedMainMenu);
-    if (selectedMainMenu === "지구대 / 경찰서 안내") {
+    if (policeSearchMode) {
       try {
         const res = await fetch(`http://localhost:80/chatBot/police?keyword=${encodeURIComponent(input)}`);
-        const policeData = await res.json();
+        const policeList = await res.json();
 
-        const gptPrompt = `
-        사용자 위치: ${input}
-        경찰서 정보:
-        1) ${policeData.name}
-        2) ${policeData.address}
-        해당 정보를 사용자에게 말풍선 스타일로 자연스럽게 안내해주세요.`;
-
-        const gptRes = await fetch("http://localhost:80/chatBot/api", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [
-              {
-                role: "system",
-                content:
-                  "당신은 안심누리의 한국어 전용 챗봇입니다. 반드시 한국어로, 말풍선 UI에 어울리는 문장으로 깔끔하게 안내해주세요. 경찰서 이름과 주소를 자연스럽게 표현해주세요."
-              },
-              {
-                role: "user",
-                content: gptPrompt
-              }
-            ]
-          })
-        });
-
-        const data = await gptRes.json();
-        const raw = data.choices?.[0]?.message?.content || "답변이 없습니다.";
-        const clean = raw.replace(/\n{2,}/g, "\n").trim();
-
-        setChatLog([...updated, { role: "assistant", content: clean }]);
+        if (Array.isArray(policeList) && policeList.length > 0) {
+          const formatted = policeList
+            .map((p, i) => `${i + 1}. ${p.name} (${p.address})`)
+            .join("\n");
+          setChatLog([...updated, { role: "assistant", content: `해당 지역의 경찰서입니다:\n\n${formatted}` }]);
+        } else {
+          setChatLog([...updated, { role: "assistant", content: "해당 지역에 대한 경찰서 정보를 찾을 수 없습니다." }]);
+        }
       } catch (error) {
-        setChatLog([...updated, { role: "assistant", content: "죄송합니다. 위치 정보를 확인할 수 없습니다. 다시 시도해주세요." }]);
+        console.error("경찰서 조회 실패:", error);
+        setChatLog([...updated, { role: "assistant", content: "오류가 발생했습니다. 다시 시도해주세요." }]);
       }
-
-      setSelectedMainMenu(null);
       return;
     }
 
@@ -129,42 +105,53 @@ console.log("💡 selectedMainMenu:", selectedMainMenu);
     setChatLog([]);
     setQuestion("");
     setSelectedMainMenu(null);
+    setPoliceSearchMode(false);
   };
 
   return (
     <div className="chatbot-container">
-      <div className="chatbot-header">💬 ChatBot</div>
-      <div className="chatbot-subtitle">🔎 무엇을 도와드릴까요?</div>
+      <div className="chatbot-header">🧐 NuriBot 😎</div>
+      <div className="chatbot-subtitle">안녕하세요! 저는 안심누리의 누리봇입니다. <br></br>🔎 어떤 도움이 필요하신가요?</div>
 
-      {!selectedMainMenu && (
-        <div className="menu-list single-column">
-            {menuOptions.map((option, i) => (
-              subMenus[option] && subMenus[option].length > 0 ? (
-                // 서브메뉴 있는 경우
-                <button key={i} className="menu-button" onClick={() => setSelectedMainMenu(option)}>
-                  {option}
-                </button>
-              ) : (
-                // 서브메뉴 없는 경우
-                <button key={i} className="menu-button" onClick={() => {
-                  setSelectedMainMenu(option);
-                  setChatLog(prev => [...prev, { role: "assistant", content: `'${option}' 메뉴를 선택하셨습니다. 안내가 필요한 위치를 입력해 주세요.` }]);
-                }}>
-                  {option}
-                </button>
-              )
-            ))}
+      {policeSearchMode && (
+        <div className="top-reset-button">
+          <button onClick={resetChat} className="menu-button">↩ 처음으로</button>
         </div>
       )}
 
-      {selectedMainMenu && (
+      {!selectedMainMenu && (
+        <div className="menu-list single-column">
+          {menuOptions.map((option, i) => (
+            subMenus[option] && subMenus[option].length > 0 ? (
+              <button key={i} className="menu-button" onClick={() => setSelectedMainMenu(option)}>
+                {option}
+              </button>
+            ) : (
+              <button key={i} className="menu-button" onClick={() => {
+                setSelectedMainMenu(option);
+                if (option === "지구대 / 경찰서 안내") {
+                  setPoliceSearchMode(true);
+                }
+                setChatLog(prev => [...prev, {
+                  role: "assistant",
+                  content: `'${option}' 메뉴를 선택하셨습니다. 안내받고 싶은 지역명을 입력해주세요.`
+                }]);
+              }}>
+                {option}
+              </button>
+            )
+          ))}
+        </div>
+      )}
+
+      {selectedMainMenu && subMenus[selectedMainMenu].length > 0 && (
         <div className="menu-list single-column">
           {subMenus[selectedMainMenu].map((option, i) => (
             <button key={i} className="menu-button" onClick={() => sendQuestion(option)}>
               {option}
             </button>
           ))}
-          <button className="menu-button" onClick={resetChat}>🔙 처음으로</button>
+          <button className="menu-button" onClick={resetChat}>↩ 처음으로</button>
         </div>
       )}
 
@@ -179,12 +166,17 @@ console.log("💡 selectedMainMenu:", selectedMainMenu);
       <div className="input-area">
         <input
           type="text"
-          placeholder="챗봇의 도움이 필요하신가요?"
+          className="chat-input"
+          placeholder={
+            policeSearchMode
+              ? "예: 강남구, 신림, 서원동"
+              : "챗봇의 도움이 필요하신가요?"
+          }
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendQuestion(question)}
         />
-        <button onClick={() => sendQuestion(question)}>전송</button>
+        <button onClick={() => sendQuestion(question)} className="send-btn">전송</button>
       </div>
     </div>
   );
