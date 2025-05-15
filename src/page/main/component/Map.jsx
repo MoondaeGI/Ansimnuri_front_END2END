@@ -1,13 +1,12 @@
 import { Note } from "../../../component";
 import {useNoteStore} from "../../../store/useNoteStore";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-//import MapGL from 'react-map-gl';
-import { Map as MapGL } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
-import { SearchBox } from '@mapbox/search-js-react';
 import axios from 'axios';
 import { useMemo } from "react";
+import { Geocoder } from '@mapbox/search-js-react';
+import { Map as MapGL, Marker } from 'react-map-gl/mapbox';
 
 export const Map = () => {
   const [noteList, setNoteList] = useState([]);
@@ -39,6 +38,7 @@ export const Map = () => {
 
   const SeoulMap3D = () => {
     const mapRef = useRef(null);
+    const [markerPos, setMarkerPos] = useState(null);
     const [streetlights, setStreetlights] = useState([]);
     const [showLights, setShowLights] = useState(false);
     const [viewState, setViewState] = useState({
@@ -54,7 +54,7 @@ export const Map = () => {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [p.longitude, p.latitude]
+          coordinates: [p.latitude, p.longitude]
         },
         properties: { id: p.id, name: p.name }
       }))
@@ -185,21 +185,41 @@ export const Map = () => {
         ...SEOUL_CENTER
       }));
     }, []);
+    
 
     return (
       <div style={{ position: 'relative', width: '100%', height: '600px' }}>
         {mapRef.current?.getMap() && (
-          <SearchBox
-            accessToken={MAPBOX_TOKEN}
-            map={mapRef.current.getMap()}
-            onSelect={handleSearchSelect}
-            options={{
-              language: 'ko',
-              country: 'kr',
-              bbox: [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat, SEOUL_BOUNDS.maxLng, SEOUL_BOUNDS.maxLat]
-            }}
-            placeholder="장소 검색..."
-          />
+          // <SearchBox
+          //   accessToken={MAPBOX_TOKEN}
+          //   map={mapRef.current.getMap()}
+          //   onSelect={handleSearchSelect}
+          //   options={{
+          //     language: 'ko',
+          //     countries: ['kr'],
+          //     bbox: [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat, SEOUL_BOUNDS.maxLng, SEOUL_BOUNDS.maxLat],
+          //   }}
+          //   placeholder="장소 검색..."
+          // />
+        <Geocoder
+          accessToken={MAPBOX_TOKEN}
+          map={mapRef.current.getMap()}
+          options={{
+            countries: ['kr'],
+            language: 'ko',
+            types: ['address', 'postcode'],
+            autocomplete: true,
+            fuzzyMatch: true,
+            proximity: { lng: 126.9768, lat: 37.5785 },
+            limit: 5
+          }}
+          onResult={({ result }) => {
+            const [lon, lat] = result.center;
+            setViewState({ longitude: lon, latitude: lat, zoom:16, pitch:45 });
+            setMarkerPos({ longitude: lon, latitude: lat });
+          }}
+          placeholder="주소 검색..."
+        />
         )}
         <MapGL
           {...viewState}
@@ -211,12 +231,26 @@ export const Map = () => {
           transitionDuration={500}
           minZoom={10}
           maxZoom={18}
-        />
-
+        >
+          {markerPos && (
+            <Marker
+              longitude={markerPos.longitude}
+              latitude={markerPos.latitude}
+              anchor="bottom"
+            >
+              <div style={{
+                width: '24px', height: '24px',
+                backgroundColor: '#e74c3c',
+                borderRadius: '50%',
+                border: '2px solid white'
+              }} />
+            </Marker>
+          )}
+        </MapGL>
         <button
           onClick={toggleView}
           style={{
-            position: 'absolute', top: 50, right: 10, zIndex: 1,
+            position: 'absolute', top: 95, right: 10, zIndex: 1,
             padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #ddd',
             borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', color: '#333'
@@ -226,14 +260,13 @@ export const Map = () => {
         <button
           onClick={() => setShowLights(v => !v)}
           style={{
-            position: 'absolute', top: 10, right: 10, zIndex: 1,
+            position: 'absolute', top: 45, right: 10, zIndex: 1,
             padding: '8px 12px', background: '#fff', border: '1px solid #ddd',
             cursor: 'pointer'
           }}
         >
           {showLights ? '지구대 숨기기' : '지구대 보기'}
         </button>
-
       </div>
     );
   };
