@@ -1,0 +1,75 @@
+.note-wrapper {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.post-it-note {
+    background: #fdf0a4 !important;   /* 연한 노란색 배경 */
+    border: none;
+    border-radius: 2px;
+    box-shadow:
+            3px 3px 5px rgba(0,0,0,0.1),
+            inset 0 -40px 40px rgba(0,0,0,0.03);
+    transform: rotate(0.5deg);  /* 살짝 기울어진 효과 */
+    transition: all 0.2s ease;
+}
+
+.post-it-note:hover {
+    transform: rotate(0deg) translateY(-5px);
+    box-shadow:
+            5px 5px 10px rgba(0,0,0,0.15),
+            inset 0 -40px 40px rgba(0,0,0,0.03);
+}
+
+.post-it-note .card-body {
+    padding: 1.5rem;
+}
+
+.note-divider {
+    border-color: rgba(0,0,0,0.1);
+    margin: 1rem 0;
+}
+
+.note-textarea {
+    background-color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.note-textarea:focus {
+    background-color: rgba(255,255,255,0.8);
+    box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.05);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.badge {
+    background-color: rgba(0,0,0,0.1) !important;
+    color: #666 !important;
+}
+
+.text-muted {
+    color: #666 !important;
+}
+
+/* 각 노트마다 랜덤하게 다른 각도로 기울어지게 하기 위한 CSS */
+.note-wrapper:nth-child(2n) .post-it-note {
+    transform: rotate(-0.5deg);
+    background: #fde68a;  /* 약간 다른 노란색 */
+}
+
+.note-wrapper:nth-child(3n) .post-it-note {
+    transform: rotate(0.8deg);
+    background: #fef08a;  /* 또 다른 노란색 */
+}
+
+.note-wrapper:nth-child(4n) .post-it-note {
+    transform: rotate(-0.8deg);
+    background: #fef9c3;  /* 원래 노란색 */
+}

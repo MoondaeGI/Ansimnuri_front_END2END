@@ -34,8 +34,12 @@
     display: flex;
     padding: 0.8rem;
     border-bottom: 1px solid #eee;
+    background-color: rgb(49, 54, 63);
   }
-  
+  .newsBox p{
+    color: white;
+    margin: auto;
+  }
   .newsList {
     flex: 1;
     overflow-y: auto;
