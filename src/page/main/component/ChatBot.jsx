@@ -102,6 +102,7 @@ export const ChatBot = () => {
     let endpoint = null;
     if (selectedMainMenu === "범죄 피해 대처 요령") endpoint = "guide";
     if (selectedMainMenu === "범죄 피해 지원 제도" && selectedSubMenu) endpoint = "support";
+    if (selectedMainMenu === "자주 묻는 질문 (FAQ)") endpoint = "faq";
 
     if (endpoint) {
       const res = await fetch(`http://localhost:80/chatBot/${endpoint}?question=${encodeURIComponent(input)}`);
