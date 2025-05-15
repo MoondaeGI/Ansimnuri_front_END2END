@@ -1,13 +1,29 @@
 import './App.css'
 import Main from './page/main/Main'
-import {Qna, Notice} from './page/board'
-import {Login, MyPage, SignIn} from './page/member'
-import {Routes, Route} from 'react-router-dom'
-import {Container, Row, Col, Navbar, Nav} from 'react-bootstrap'
-import {useState} from 'react'
+import { Qna, Notice } from './page/board'
+import { Login, MyPage, RegisterPage } from './page/member'
+import { Routes, Route } from 'react-router-dom'
+import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
+import { useEffect, useState } from 'react'
+import { useAuthStore } from './store/useAuthStore'
+import { useNoteStore } from './store/useNoteStore'
 
 function App() {
   const [expanded, setExpanded] = useState(false)
+
+  const {token,initialize, logout } = useAuthStore();
+  const {disconnect} = useNoteStore();
+
+  useEffect(() => {
+      initialize();
+  }, [])
+
+  const handleLogout = () => {
+    logout();
+    disconnect();
+    window.location.href = '/'
+  }
+
 
   return (
     <Container fluid className="App p-0">
@@ -22,8 +38,18 @@ function App() {
               <Nav.Link href="/notice/list">공지사항</Nav.Link>
               <Nav.Link href="/qna/list">QNA</Nav.Link>
               <Nav.Link href="/guide">이용가이드</Nav.Link>
-              <Nav.Link href="/mypage">마이페이지</Nav.Link>
-              <Nav.Link href="/login">로그인</Nav.Link>
+
+              {token ? (
+                <>
+                  <Nav.Link href="/mypage">마이페이지</Nav.Link>
+                  <Nav.Link onClick={handleLogout}>로그아웃</Nav.Link>
+                </>
+              ) : (
+                <>
+                  <Nav.Link href="/login">로그인</Nav.Link>
+                  <Nav.Link href="/RegisterPage">회원가입</Nav.Link>
+                </>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -37,7 +63,9 @@ function App() {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/notice/*" element={<Notice />} />
           <Route path="/qna/*" element={<Qna />} />
-        </Routes>
+          <Route path="/RegisterPage/*" element={<RegisterPage />} />
+
+        </Routes> 
       </main>
 
       {/* Footer */}
@@ -70,5 +98,5 @@ function App() {
     </Container>
   )
 }
-// test
+
 export default App

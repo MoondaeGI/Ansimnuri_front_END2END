@@ -11,12 +11,11 @@ const Main = () => {
       <div className="mainContent">
         <div className="chatListPanel">
           <div className="newsBox">
-           뉴스
-    
+           <p>뉴스</p>
           </div>
 
           <div className="newsList">
-            <News/>
+           <News/>
           </div>
         </div>
 

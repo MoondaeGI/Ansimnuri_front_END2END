@@ -1,7 +1,8 @@
 export const parseDate = (date) => {
     const now = new Date();
+    const parsedDate = new Date(date);
 
-    const minusTime = now.getTime() - date.getTime();
+    const minusTime = now.getTime() - parsedDate.getTime();
     if (minusTime < MINUTE) {
         return "방금 전"
     } else if (minusTime < MINUTE * 5) {

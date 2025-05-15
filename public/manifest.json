@@ -1,0 +1,20 @@
+{
+  "short_name": "ansimnuri",
+  "name": "Smart Safety Platform - ansimnuri",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icons/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/biglogo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
