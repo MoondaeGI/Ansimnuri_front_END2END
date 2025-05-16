@@ -6,8 +6,7 @@ import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import axios from 'axios';
 import { useMemo } from "react";
 import { Geocoder } from '@mapbox/search-js-react';
-import { Map as MapGL } from 'react-map-gl/mapbox';
-import {Marker} from '../../../component'
+import { Map as MapGL, Marker } from 'react-map-gl/mapbox';
 
 export const Map = () => {
   const {noteList, setNoteList, connect} = useNoteStore()
@@ -240,11 +239,6 @@ export const Map = () => {
           minZoom={10}
           maxZoom={18}
         >
-          {markerPos && (
-              streetlights.map((light, index) => (
-                  <Marker key={index} longitude={light.longitude} latitude={light.latitude} />
-              ))
-          )}
           <NoteList />
         </MapGL>
         <button
@@ -274,9 +268,6 @@ export const Map = () => {
   return (
     <div>
       <SeoulMap3D />
-      <div>
-        {noteComponentList}
-      </div>
       <div style={{ margin: '20px auto', maxWidth: '800px' }}>
       </div>
     </div>

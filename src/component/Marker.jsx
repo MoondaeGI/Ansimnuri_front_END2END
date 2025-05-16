@@ -1,7 +1,7 @@
 import {Marker as M} from 'react-map-gl/mapbox';
 import './css/Marker.css';
 
-export const Marker = ({latitude, longitude, color = '#FF5252', ...props}) => {
+export const Marker = ({children, latitude, longitude, color = '#FF5252', ...props}) => {
     return (
         <M latitude={latitude} longitude={longitude} color={color} {...props}>
             <div className="map-marker">
