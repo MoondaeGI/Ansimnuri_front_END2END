@@ -46,7 +46,6 @@ export const Map = () => {
   };
 
   const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
-  const SAFE_TOKEN = process.env.REACT_APP_SAFE_TOKEN;
 
   const SeoulMap3D = () => {
     const [userLocation, setUserLocation] = useState(null);
@@ -127,7 +126,6 @@ export const Map = () => {
     }, []);
 
     const onMapLoad = useCallback((e) => {
-
       const map = mapRef.current?.getMap();
       if (!map || map.getLayer('3d-buildings')) return;
 
@@ -151,31 +149,6 @@ export const Map = () => {
           color: '#f5e0b7',
           intensity: 0.6,
           position: [1.15, 210, 30]  // [radial, azimuthal, polar]
-        });
-        map.addSource('crime-zones', {
-          type: 'raster',
-          tiles: [
-            `http://www.safemap.go.kr/openApiService/wms/getLayerData.do?` +
-            `&apikey=${SAFE_TOKEN}` +
-            `&layers=A2SM_CRMNLHSPOT_TOT` +
-            `&styles=` +
-            `&bbox={bbox-epsg-3857}` +
-            `&width=256&height=256&srs=EPSG:3857` +
-            `&format=image/png&transparent=true`
-          ],
-          tileSize: 256
-        });
-
-        map.addLayer({
-          id: 'crime-zones-layer',
-          type: 'raster',
-          source: 'crime-zones',
-          layout: {
-            visibility: 'none' // 기본적으로 보이도록 설정
-          },
-          paint: {
-            'raster-opacity': 0.7 // 투명도 설정
-          }
         });
       });
 
@@ -294,7 +267,6 @@ export const Map = () => {
         showLights ? 'visible' : 'none'
       );
     }, [streetlights, showLights]);
-
 
     const toggleView = useCallback(() => {
       setViewState(prev => constrainView({
@@ -416,27 +388,6 @@ export const Map = () => {
             fontSize: '16px'
           }}
         >GPS
-        </button>
-        <button
-          onClick={() => {
-            const map = mapRef.current?.getMap();
-            if (map && map.getLayer('crime-zones-layer')) {
-              const visibility = map.getLayoutProperty('crime-zones-layer', 'visibility');
-              map.setLayoutProperty(
-                'crime-zones-layer',
-                'visibility',
-                visibility === 'visible' ? 'none' : 'visible'
-              );
-            }
-          }}
-          style={{
-            position: 'absolute', top: 190, right: 10, zIndex: 1,
-            padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #ddd',
-            borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            cursor: 'pointer', fontSize: '14px'
-          }}
-        >
-          범죄주의
         </button>
       </div>
     );

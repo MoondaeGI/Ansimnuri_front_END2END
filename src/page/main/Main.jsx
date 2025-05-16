@@ -3,30 +3,44 @@ import { Chat, ChatBot, Map, News } from './component';
 import './component/css/main.css';
 
 const Main = () => {
- const [isChatBotOpen, setIsChatBotOpen] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [isChatBotOpen, setIsChatBotOpen] = useState(false);
+  const [isNewsOpen, setIsNewsOpen] = useState(false); // 뉴스 토글 상태 추가
 
   const toggleChatBot = () => {
     setIsChatBotOpen(prev => !prev);
   };
+
+  const toggleNews = () => {
+    setIsNewsOpen(prev => !prev);
+  };
+
   return (
     <div className="mainContainer">
       <div className="mainContent">
-        <div className="chatListPanel">
-          <div className="newsBox">
-            <p>뉴스</p>
-          </div>
-
-          <div className="newsList">
-            <News />
-          </div>
-        </div>
+          <button className="newsToggleBtn" onClick={toggleNews}>
+            📰
+          </button>
+          {isNewsOpen && (
+            <div className="newsPanel">
+              <div className="newsBox">
+                <div className="newsHeader">
+                  <span>뉴스</span>
+                  <button onClick={toggleNews}>✕</button>
+                </div>
+              </div>
+              <div className="newsList">
+                <News />
+              </div>
+            </div>
+          )}
+      
 
         <div className="mapSection">
           <div className="mapContainer">
             <Map />
           </div>
         </div>
+
         <button className="chatbotBtn" onClick={toggleChatBot}>
           💬
         </button>
@@ -36,7 +50,7 @@ const Main = () => {
               <div className="infoTitle">
                 <div className="chatbotHeader">
                   <span>안심 챗봇</span>
-                  <button onClick={toggleChatBot}>✕</button>
+                
                 </div>
               </div>
               <ChatBot />
@@ -44,10 +58,7 @@ const Main = () => {
           </div>
         )}
       </div>
-
-
     </div>
-
   );
 };
 

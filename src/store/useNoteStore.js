@@ -62,6 +62,7 @@ export const useNoteStore = create((set, get) => ({
                     noteList: prev.noteList
                         .map(note => (note.id === Number(noteDTO.id)) ? noteDTO : note)
                 }))
+                sessionStorage.setItem('noteList', JSON.stringify(get().noteList))
                 console.log(JSON.stringify(get().noteList))
                 break
             case 'DELETE':

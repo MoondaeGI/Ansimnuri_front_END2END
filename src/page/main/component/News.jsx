@@ -19,7 +19,7 @@ export const News = () => {
         {newsList.map((article, index) => (
           <div className="newsCard" key={index}>
             <div className="newsImgWrapper">
-              <p className="newsImg">{article.title}</p>
+              <img src={article.img} className="newsImg"/>
             </div>
             <div className="newsContent">
               <h3 className="newsTitle">
