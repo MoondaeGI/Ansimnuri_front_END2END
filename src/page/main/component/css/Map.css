@@ -32,3 +32,30 @@
 .search-marker {
   background: rgba(255, 0, 0, 0.8);
 }
+.search-marker {
+  width: 24px;
+  height: 24px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.user-marker {
+  width: 20px;
+  height: 20px;
+  background-color: #4285F4;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-marker::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background-color: white;
+  border-radius: 50%;
+}

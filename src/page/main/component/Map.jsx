@@ -9,6 +9,8 @@ import { useMemo } from "react";
 import { Geocoder } from '@mapbox/search-js-react';
 import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
+import { SearchBox } from '@mapbox/search-js-react';
+
 
 export const Map = () => {
   const { noteList, setNoteList, connect } = useNoteStore()
@@ -44,6 +46,7 @@ export const Map = () => {
   };
 
   const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
+  const SAFE_TOKEN = process.env.REACT_APP_SAFE_TOKEN;
 
   const SeoulMap3D = () => {
     const [userLocation, setUserLocation] = useState(null);
@@ -124,10 +127,78 @@ export const Map = () => {
     }, []);
 
     const onMapLoad = useCallback((e) => {
+
       const map = mapRef.current?.getMap();
       if (!map || map.getLayer('3d-buildings')) return;
 
-      map.addControl(new MapboxLanguage({ defaultLanguage: 'ko', supportedLanguages: ['ko', 'en'] }));
+      map.addControl(new MapboxLanguage({
+        defaultLanguage: 'ko',
+        supportedLanguages: ['ko', 'ko-Hang', 'ko-KR']
+      }));
+
+      map.on('style.load', () => {
+        map.getStyle().layers.forEach(layer => {
+          if (layer.type === 'symbol' && layer.layout?.['text-field']) {
+            map.setLayoutProperty(
+              layer.id,
+              'text-field',
+              ['coalesce', ['get', 'name_ko'], ['get', 'name']]
+            );
+          }
+        });
+        map.setLight({
+          anchor: 'viewport',
+          color: '#f5e0b7',
+          intensity: 0.6,
+          position: [1.15, 210, 30]  // [radial, azimuthal, polar]
+        });
+        map.addSource('crime-zones', {
+          type: 'raster',
+          tiles: [
+            `http://www.safemap.go.kr/openApiService/wms/getLayerData.do?` +
+            `&apikey=${SAFE_TOKEN}` +
+            `&layers=A2SM_CRMNLHSPOT_TOT` +
+            `&styles=` +
+            `&bbox={bbox-epsg-3857}` +
+            `&width=256&height=256&srs=EPSG:3857` +
+            `&format=image/png&transparent=true`
+          ],
+          tileSize: 256
+        });
+
+        map.addLayer({
+          id: 'crime-zones-layer',
+          type: 'raster',
+          source: 'crime-zones',
+          layout: {
+            visibility: 'none' // 기본적으로 보이도록 설정
+          },
+          paint: {
+            'raster-opacity': 0.7 // 투명도 설정
+          }
+        });
+      });
+
+      // 눈 효과 적용 (한 번만 호출)
+      // map.on('style.load', () => {
+      //   map.setRain({
+      //     density: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.7],
+      //     intensity: 1.0,
+      //     color: '#ffffff',
+      //     'flake-size': 1.2,
+      //     opacity: 0.9,
+      //     vignette: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.4]
+      //   });
+      // });
+      // // 초기 스타일에도 바로 눈 내리기
+      // map.setRain({
+      //   density: 0.7,
+      //   intensity: 1.0,
+      //   color: '#ffffff',
+      //   'flake-size': 1.2,
+      //   opacity: 0.9,
+      //   vignette: 0.4
+      // });
 
       map.addSource('police-stations', {
         type: 'geojson',
@@ -145,6 +216,13 @@ export const Map = () => {
           'circle-stroke-width': 2,
           'circle-stroke-color': '#fff'
         }
+      });
+
+      map.on('style.load', () => {
+        //map.setConfigProperty('basemap', 'lightPreset', 'dawn');  // 일출
+        // map.setConfigProperty('basemap', 'lightPreset', 'day');   // 낮
+        // map.setConfigProperty('basemap', 'lightPreset', 'dusk');  // 일몰
+        map.setConfigProperty('basemap', 'lightPreset', 'night'); // 밤
       });
 
       // 3D 건물 레이어
@@ -217,6 +295,7 @@ export const Map = () => {
       );
     }, [streetlights, showLights]);
 
+
     const toggleView = useCallback(() => {
       setViewState(prev => constrainView({
         ...prev,
@@ -230,35 +309,30 @@ export const Map = () => {
     return (
       <div style={{ position: 'relative', width: '100%', height: '600px' }}>
         {mapRef.current?.getMap() && (
-          // <SearchBox
-          //   accessToken={MAPBOX_TOKEN}
-          //   map={mapRef.current.getMap()}
-          //   onSelect={handleSearchSelect}
-          //   options={{
-          //     language: 'ko',
-          //     countries: ['kr'],
-          //     bbox: [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat, SEOUL_BOUNDS.maxLng, SEOUL_BOUNDS.maxLat],
-          //   }}
-          //   placeholder="장소 검색..."
-          // />
-          <Geocoder
+          <SearchBox
             accessToken={MAPBOX_TOKEN}
             map={mapRef.current.getMap()}
+            mapboxgl={mapboxgl}
+            marker={true}
             options={{
               countries: ['kr'],
-              language: 'ko',
-              types: ['address', 'postcode'],
+              languages: ['ko'],
+              types: ['address', 'street', 'postcode', 'district', 'place', 'locality', 'neighborhood'],
+              proximity: { lng: SEOUL_CENTER.longitude, lat: SEOUL_CENTER.latitude },
+              bbox: [
+                126.764,
+                37.428,
+                127.184,
+                37.701
+              ],
+              proximity: {
+                lng: SEOUL_CENTER.longitude,
+                lat: SEOUL_CENTER.latitude
+              },
               autocomplete: true,
-              fuzzyMatch: true,
-              proximity: { lng: 126.9768, lat: 37.5785 },
-              limit: 5
+              fuzzyMatch: true
             }}
-            onResult={({ result }) => {
-              const [lon, lat] = result.center;
-              setViewState({ longitude: lon, latitude: lat, zoom: 16, pitch: 45 });
-              setMarkerPos({ longitude: lon, latitude: lat });
-            }}
-            placeholder="주소 검색..."
+            placeholder='주소 또는 지역명 검색'
           />
         )}
         <MapGL
@@ -342,6 +416,27 @@ export const Map = () => {
             fontSize: '16px'
           }}
         >GPS
+        </button>
+        <button
+          onClick={() => {
+            const map = mapRef.current?.getMap();
+            if (map && map.getLayer('crime-zones-layer')) {
+              const visibility = map.getLayoutProperty('crime-zones-layer', 'visibility');
+              map.setLayoutProperty(
+                'crime-zones-layer',
+                'visibility',
+                visibility === 'visible' ? 'none' : 'visible'
+              );
+            }
+          }}
+          style={{
+            position: 'absolute', top: 190, right: 10, zIndex: 1,
+            padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #ddd',
+            borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            cursor: 'pointer', fontSize: '14px'
+          }}
+        >
+          범죄주의
         </button>
       </div>
     );
