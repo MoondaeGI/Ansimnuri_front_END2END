@@ -146,13 +146,75 @@ export const RegisterPage = () => {
     privacy: false,
     marketing: false
   });
-  const confirmAndCheck = () => {
-    if (agreedType) {
-      setAgreements(prev => ({ ...prev, [agreedType]: true }));
+const confirmAndCheck = () => {
+  if (agreedType) {
+    setAgreements(prev => ({ ...prev, [agreedType]: true }));
+  }
+  closeModal();
+};
+
+
+  const openAgreementModal = (type) => {
+    setAgreedType(type);
+    if (type === 'terms') {
+      openModal(`📌 안심누리 이용약관
+제1조 (목적)
+이 약관은 "안심누리(이하 '회사')"가 제공하는 서비스의 이용조건 및 절차, 이용자와 회사 간의 권리∙의무 및 책임사항을 규정함을 목적으로 합니다.
+
+제2조 (서비스의 정의)
+회사는 이용자에게 범죄 예방을 위한 정보 제공, 위치 기반 안전 경로 안내, 커뮤니티 기능 등을 제공합니다.
+
+제3조 (이용자의 의무)
+
+타인의 개인정보를 도용하거나 부정한 행위를 해서는 안됩니다.
+
+서비스 내 제공되는 정보의 무단 복제 및 상업적 이용을 금합니다.
+
+범죄와 관련된 허위신고, 비방, 협박 등은 이용 제한 조치가 될 수 있습니다.
+
+제4조 (서비스 이용의 제한)
+회사는 다음과 같은 경우 사전 통보 없이 이용을 제한하거나 해지할 수 있습니다.
+
+타인 명의 도용, 허위 정보 등록
+
+서비스 방해 행위 또는 범죄 목적의 사용
+
+기타 회사의 정책상 위반으로 판단되는 경우
+
+제5조 (개인정보 보호)
+이용자의 개인정보는 관련 법령에 따라 보호되며, 회사의 [개인정보처리방침]에 따릅니다.
+
+제6조 (책임 제한)
+회사는 이용자의 부주의로 발생한 손해에 대해 책임을 지지 않으며, 제3자와의 분쟁에도 관여하지 않습니다.
+
+제7조 (약관의 변경)
+회사는 약관을 사전 고지 없이 변경할 수 있으며, 변경된 내용은 홈페이지를 통해 공지됩니다. 변경 이후에도 서비스를 계속 이용하는 경우, 변경된 약관에 동의한 것으로 간주됩니다.`); // 전체 약관 내용
+    } else if (type === 'privacy') {
+      openModal(`[개인정보 수집 및 이용 동의서]
+
+1. 수집 항목:
+- 필수: 이름, 아이디, 비밀번호, 이메일, 주소, 연락처
+- 선택: 마케팅 수신 동의 여부 등
+
+2. 수집 목적:
+- 회원 가입 및 본인 확인
+- 서비스 제공 및 이용자 식별
+- 공지사항 전달 및 문의 응대
+- 마케팅 정보 안내 (선택 항목 해당 시)
+
+3. 보유 및 이용 기간:
+- 회원 탈퇴 시까지
+- 단, 관련 법령에 따라 보관이 필요한 경우 해당 기간 동안 보관
+
+4. 동의 거부 권리 및 불이익:
+- 개인정보 제공을 거부할 권리가 있으나, 이 경우 서비스 이용에 제한이 있을 수 있습니다.
+
+※ 위 내용을 충분히 이해하였으며, 개인정보 수집 및 이용에 동의합니다.`);
     }
-    closeModal();
   };
-    
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { loginId, password, rePassword, nickname, email, postcode, address, detailAddress } = form;
@@ -175,99 +237,96 @@ export const RegisterPage = () => {
   return (
     <div className="container">
       <h2 className="text-xl font-bold mb-4">회원가입</h2>
-      <form onSubmit={handleSubmit}>
-        <div className='box'>
-        아이디 <input name="loginId" ref={idInputRef} placeholder="아이디" onChange={handleChange} className="input" />
-        <button className="btn" type="button" onClick={checkId}>중복확인</button>
-        </div><br />
-   <div className='box'>
-        비밀번호 <input name="password" type="password" placeholder="비밀번호" onChange={handleChange} className="input" /><br />
-        <div className="text-red-500 text-sm">{pwMessage}</div>
-</div>
-   <div className='box'>
-        비밀번호 재확인 <input name="rePassword" type="password" placeholder="비밀번호재확인" onChange={handleChange} className="input" />
-        <div className="text-sm" style={{ color: pwMatchMessage.includes('일치하지') ? 'red' : 'green' }}>
-          {pwMatchMessage}
-        </div>
-                </div>
-         <div className='box'>
-        닉네임 <input name="nickname" ref={nickNameInputRef} placeholder="닉네임" onChange={handleChange} className="input" />
-        <button className="btn" type='button' onClick={checkNickName}>중복확인</button>
-        </div><br />
-         <div className='box'>
-        이메일 <input type="email" name="email" onChange={handleChange} className="input" /></div><br />
-        <div className="text-sm" style={{ color: emailMessage.includes('올바른') ? 'green' : 'red' }}>
-          {emailMessage}
-        </div>
+      <div className='innerBox'>
 
-        <div className="form-group">
-          <label>우편번호</label>
-          <div className="input-with-btn">
-            <input type="text" className="input" name="postcode" value={form.postcode} readOnly />
-            <button type="button" className="btn"onClick={handlePostcode}>검색</button>
+        <form onSubmit={handleSubmit}>
+          <div className='box'>
+            <label className="formLabel">아이디</label> <input name="loginId" ref={idInputRef} placeholder="아이디" onChange={handleChange} className="input" />
+            <button className="btn" type="button" onClick={checkId}>중복확인</button>
+          </div><br />
+          <div className='box'>
+            <label className="formLabel">비밀번호</label> <input name="password" type="password" placeholder="비밀번호" onChange={handleChange} className="input" /><br />
+            <div className="text-red-500 text-sm">{pwMessage}</div>
           </div>
-        </div>
-
-        <div className="form-group">
-          <label>주소</label>
-          <input type="text" className="input" name="address" value={form.address} readOnly />
-        </div>
-
-        <div className="form-group">
-          <label>상세주소</label>
-          <input type="text" className="input" name="detailAddress" value={form.detailAddress} onChange={handleChange} />
-        </div>
-
-        <div className="agreement-section mt-4">
-          <label>
-            <input type="checkbox" required /> 이용약관 동의
-            <button type="button" onClick={() => openModal('이용약관 내용입니다.')}>보기</button>
-          </label><br />
-          <label>
-            <input type="checkbox" required /> 개인정보 수집방침 동의
-            <button type="button" onClick={() => openModal(`
-[개인정보 수집 및 이용 동의서]
-
-1. 수집 항목:
-- 필수: 이름, 아이디, 비밀번호, 이메일, 주소, 연락처
-- 선택: 마케팅 수신 동의 여부 등
-
-2. 수집 목적:
-- 회원 가입 및 본인 확인
-- 서비스 제공 및 이용자 식별
-- 공지사항 전달 및 문의 응대
-- 마케팅 정보 안내 (선택 항목 해당 시)
-
-3. 보유 및 이용 기간:
-- 회원 탈퇴 시까지
-- 단, 관련 법령에 따라 보관이 필요한 경우 해당 기간 동안 보관
-
-4. 동의 거부 권리 및 불이익:
-- 개인정보 제공을 거부할 권리가 있으나, 이 경우 서비스 이용에 제한이 있을 수 있습니다.
-
-※ 위 내용을 충분히 이해하였으며, 개인정보 수집 및 이용에 동의합니다.
-            `)}>보기</button>
-          </label><br />
-       
-        </div>
-
-        <button type="submit"className="btn" >가입하기</button>
-      </form>
-
-      {showModal && (
-        <div className="modal-backdrop" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>약관 상세</h3>
-            <pre style={{ whiteSpace: 'pre-wrap' }}>{modalContent}</pre>
-            <div className="modal-buttons">
-              <button onClick={closeModal}>닫기</button>
-              <button onClick={confirmAndCheck}>동의</button>
+          <div className='box'>
+            <label className="formLabel">비밀번호 재확인</label><input name="rePassword" type="password" placeholder="비밀번호재확인" onChange={handleChange} className="input" />
+            <div className="text-sm" style={{ color: pwMatchMessage.includes('일치하지') ? 'red' : 'green' }}>
+              {pwMatchMessage}
             </div>
+          </div>
+          <div className='box'>
+            <label className="formLabel">닉네임</label><input name="nickname" ref={nickNameInputRef} placeholder="닉네임" onChange={handleChange} className="input" />
+            <button className="btn" type='button' onClick={checkNickName}>중복확인</button>
+          </div><br />
+          <div className='box'>
+            <label className="formLabel">이메일</label><input type="email" name="email" onChange={handleChange} className="input" /></div><br />
+          <div className="text-sm" style={{ color: emailMessage.includes('올바른') ? 'green' : 'red' }}>
+            {emailMessage}
+          </div>
 
+          <div className="box">
+            <label className="formLabel">우편번호</label>
+
+            <input type="text" className="input" name="postcode" value={form.postcode} readOnly />
+            <button type="button" className="btn" onClick={handlePostcode}>검색</button>
 
           </div>
-        </div>
-      )}
+
+          <div className="box">
+            <label className="formLabel">주소</label>
+            <input type="text" className="input" name="address" value={form.address} readOnly />
+          </div>
+
+          <div className="box">
+            <label className="formLabel">상세주소</label>
+            <input type="text" className="input" name="detailAddress" value={form.detailAddress} onChange={handleChange} />
+          </div>
+
+          <div className="agreementSection mt-4">
+            <label>
+              <input
+                type="checkbox"
+                checked={agreements.terms}
+                onChange={() =>
+                  setAgreements(prev => ({ ...prev, terms: !prev.terms }))
+                }
+                required
+              /> 이용약관 동의
+              <button type="button" className="btn" onClick={() => openAgreementModal('terms')}>보기</button>
+            </label><br />
+
+            <label>
+              <input
+                type="checkbox"
+                checked={agreements.privacy}
+                onChange={() =>
+                  setAgreements(prev => ({ ...prev, privacy: !prev.privacy }))
+                }
+                required
+              /> 개인정보 수집방침 동의
+              <button type="button" className="btn" onClick={() => openAgreementModal('privacy')}>보기</button>
+            </label><br />
+            <button type="submit" className="btn" >가입하기</button>
+          </div>
+
+
+        </form>
+
+        {showModal && (
+          <div className="modalBackdrop" onClick={closeModal}>
+            <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+              <h3>약관 상세</h3>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>{modalContent}</pre>
+              <div className="modalButtons">
+                <button onClick={closeModal}>닫기</button>
+                <button onClick={confirmAndCheck}>확인</button>
+              </div>
+
+
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
