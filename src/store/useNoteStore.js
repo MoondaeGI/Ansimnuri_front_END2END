@@ -5,7 +5,7 @@ export const useNoteStore = create((set, get) => ({
     noteList: [],
 
     initialize: () => {
-        const noteList = sessionStorage.getItem('noteList')
+        const noteList = JSON.parse(sessionStorage.getItem('noteList'));
         if(noteList) {
             set({noteList: noteList})
         }
@@ -16,19 +16,29 @@ export const useNoteStore = create((set, get) => ({
                 console.log('connect')
                 set({socket: ws})
             }
+
+            ws.onmessage = (event) => {
+                get().message(event)
+            }
         }
     },
 
     setNoteList: (noteList) => {
         set({noteList: noteList})
-        sessionStorage.setItem('noteList', noteList)
+        sessionStorage.setItem('noteList', JSON.stringify(noteList))
     },
 
     connect: () => {
-        const ws = new WebSocket(`ws://localhost:80/ws/note`)
-        ws.onopen = () => {
-            console.log('connect')
-            set({socket: ws})
+        if (!get().socket) {
+            const ws = new WebSocket(`ws://localhost:80/ws/note`)
+            ws.onopen = () => {
+                console.log('connect')
+                set({socket: ws})
+            }
+
+            ws.onmessage = (event) => {
+                get().message(event)
+            }
         }
     },
 
@@ -36,30 +46,30 @@ export const useNoteStore = create((set, get) => ({
         set({socket: null})
     },
 
-    message: () => {
-        get().socket.onmessage = (event) => {
-            const {requestType, requesterId, noteDTO} = event.data
-            console.log(requestType, requesterId, noteDTO)
+    message: (event) => {
+        const {requestType, requesterId, noteDTO} = JSON.parse(event.data)
+        console.log(requestType, requesterId, noteDTO)
 
-            switch (requestType) {
-                case 'INSERT':
-                    set(prev => ({
-                        noteList: [...prev.noteList, noteDTO]
-                    }))
-                    break
-                case 'UPDATE':
-                    set(prev => ({
-                        noteList: prev.noteList
-                            .map(note => (note.id === noteDTO.id) ? noteDTO : note)
-                    }))
-                    break
-                case 'DELETE':
-                    set(prev => ({
-                        noteList: prev.noteList
-                            .filter(note => note.id !== noteDTO.id)
-                    }))
-                    break
-            }
+        switch (requestType) {
+            case 'INSERT':
+                set(prev => ({
+                    noteList: [...prev.noteList, noteDTO]
+                }))
+                break
+            case 'UPDATE':
+                console.log("업데이트!")
+                set(prev => ({
+                    noteList: prev.noteList
+                        .map(note => (note.id === Number(noteDTO.id)) ? noteDTO : note)
+                }))
+                console.log(JSON.stringify(get().noteList))
+                break
+            case 'DELETE':
+                set(prev => ({
+                    noteList: prev.noteList
+                        .filter(note => note.id !== noteDTO.id)
+                }))
+                break
         }
     }
 }))
