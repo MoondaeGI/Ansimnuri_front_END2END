@@ -1,5 +1,5 @@
 import { Note } from "../../../component";
-import {useNoteStore} from "../../../store/useNoteStore";
+import {useNoteStore} from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
@@ -9,7 +9,7 @@ import { Geocoder } from '@mapbox/search-js-react';
 import { Map as MapGL, Marker } from 'react-map-gl/mapbox';
 
 export const Map = () => {
-  const [noteList, setNoteList] = useState([]);
+  const {noteList, setNoteList, connect} = useNoteStore()
   
   useEffect(() => {
     axios.get('http://localhost:80/api/note')
