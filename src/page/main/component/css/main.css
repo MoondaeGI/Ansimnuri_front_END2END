@@ -20,6 +20,7 @@
     display: flex;
     flex: 1;
     overflow: hidden;
+    position: relative
   }
   
   .chatListPanel {
@@ -152,5 +153,60 @@
     .chatSection {
       height: 250px;
     }
+    /* 패널 숨기기/보이기 */
+.slide-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  height: 100%;
+  z-index: 1000;
+}
+
+.slide-left.active {
+  transform: translateX(0);
+}
+
+.slide-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  height: 100%;
+  z-index: 1000;
+}
+
+.slide-right.active {
+  transform: translateX(0);
+}
+
+/* 화살표 버튼 */
+.toggleArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 60px;
+  background-color: #444;
+  color: white;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2000;
+  user-select: none;
+}
+
+.toggleArrow.left {
+  right: -30px; /* 뉴스 패널의 오른쪽에 버튼 */
+}
+
+.toggleArrow.right {
+  left: -30px; /* 챗봇 패널의 왼쪽에 버튼 */
+}
+
   }
   
