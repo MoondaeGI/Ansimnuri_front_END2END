@@ -1,9 +1,11 @@
 import {parseDate} from "../util";
-import {Button} from "../component";
+import {Button, Marker} from "../component";
 import {useState} from "react";
 import caxios from "../lib/caxios";
 import "./css/Note.css";
+import "./css/Popup.css";
 import {useAuthStore, useNoteStore } from "../store";
+import {Popup} from "react-map-gl/mapbox";
 
 export const Note = ({id: _id}) => {
     const dto = useNoteStore(state => state.noteList.find(note => note.id == _id))
@@ -197,5 +199,50 @@ export const EmptyNote = ({latitude, longitude}) => {
                 </div>
             </form>
         </div>
+    )
+}
+
+export const NoteList = () => {
+    const noteList = useNoteStore(state => state.noteList)
+    const [selectedNote, setSelectedNote] = useState(null);
+
+    return (
+        <>
+            {noteList.map(note => (
+                <Marker
+                    key={note.id}
+                    latitude={note.latitude}
+                    longitude={note.longitude}
+                    onClick={(e) => {  // onClick 오타 수정
+                        e.originalEvent.stopPropagation();
+                        setSelectedNote(note);
+                    }}
+                >
+                    <div className="marker">📍</div>  {/* 마커 스타일링을 위한 div 추가 */}
+                </Marker>
+            ))}
+
+            {/* Popup을 Marker 밖으로 이동 */}
+            {selectedNote && (
+                <Popup
+                    longitude={selectedNote.longitude}
+                    latitude={selectedNote.latitude}
+                    anchor="bottom"
+                    closeButton={false}
+                    closeOnClick={false}      // 맵 클릭 시 팝업 닫기 방지
+                    closeOnMove={false}       // 맵 이동 시 팝업 닫기 방지
+                    onClick={(e) => {         // 팝업 내부 클릭 이벤트 처리
+                        e.stopPropagation();
+                    }}
+                    interactive={true}
+                    className="custom-popup"
+                    onClose={() => setSelectedNote(null)}
+                >
+                    <div onClick={(e) => e.stopPropagation()}>  {/* 추가 이벤트 버블링 방지 */}
+                        <Note id={selectedNote.id} />
+                    </div>
+                </Popup>
+            )}
+        </>
     )
 }

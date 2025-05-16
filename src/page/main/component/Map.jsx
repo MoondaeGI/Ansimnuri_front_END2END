@@ -1,4 +1,4 @@
-import { Note } from "../../../component";
+import { Note, NoteList } from "../../../component";
 import {useNoteStore} from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -239,20 +239,7 @@ export const Map = () => {
           minZoom={10}
           maxZoom={18}
         >
-          {markerPos && (
-            <Marker
-              longitude={markerPos.longitude}
-              latitude={markerPos.latitude}
-              anchor="bottom"
-            >
-              <div style={{
-                width: '24px', height: '24px',
-                backgroundColor: '#e74c3c',
-                borderRadius: '50%',
-                border: '2px solid white'
-              }} />
-            </Marker>
-          )}
+          <NoteList />
         </MapGL>
         <button
           onClick={toggleView}
@@ -281,9 +268,6 @@ export const Map = () => {
   return (
     <div>
       <SeoulMap3D />
-      <div>
-        {noteComponentList}
-      </div>
       <div style={{ margin: '20px auto', maxWidth: '800px' }}>
       </div>
     </div>
