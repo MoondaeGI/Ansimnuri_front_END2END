@@ -5,7 +5,7 @@
     padding: 0;
     
   }
-  
+
   .mainContainer {
     display: flex;
     flex-direction: column;
@@ -165,5 +165,51 @@
     .chatSection {
       height: 250px;
     }
+
+.chatbotBtn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+
+  color: white;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.infoPanel {
+  position: fixed;
+  bottom: 90px;
+  right: 2rem;
+  width: 350px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.infoSection {
+  padding: 1rem;
+}
+
+.chatbotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e3255;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+}
+
+
   }
   
