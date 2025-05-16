@@ -3,9 +3,12 @@ import {Button} from "../component";
 import {useState} from "react";
 import caxios from "../lib/caxios";
 import "./css/Note.css";
-import {useAuthStore} from "../store";
+import {useAuthStore, useNoteStore } from "../store";
 
-export const Note = ({dto}) => {
+export const Note = ({id: _id}) => {
+    const dto = useNoteStore(state => state.noteList.find(note => note.id == _id))
+    console.log(dto)
+
     const {id, content, userId, nickname, latitude, longitude, regDate, recCount, replyCount} = dto
     const date = parseDate(regDate)
 
@@ -18,6 +21,7 @@ export const Note = ({dto}) => {
         content: content,
         userId: userId
     })
+
     const [replyList, setReplyList] = useState([])
     const [isUpdate, setIsUpdate] = useState(false)
 
@@ -70,7 +74,7 @@ export const Note = ({dto}) => {
                     <small className="text-muted me-2">작성자: {nickname}</small>
                     <small className="text-muted">추천: {recCount}</small>
                 </div>
-                {(loginId && loginId === form.userId) && (
+                {(loginId && loginId === userId) && (
                     <div className="d-flex justify-content-end mb-3">
                         <Button className="btn btn-outline-primary btn-sm me-2"
                                 onClick={(e) => {

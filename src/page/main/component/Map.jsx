@@ -18,9 +18,16 @@ export const Map = () => {
     })
   }, [])
 
-  const noteComponentList = useMemo(() => {
-    return noteList.map((note, index) => <Note key={index} dto={note} />)
-  }, [noteList])
+  useEffect(() => {
+    const reConnect = setInterval(() => {
+        connect()
+    }, 1000)
+
+    return clearInterval(reConnect)
+  }, [connect])
+
+  const noteComponentList =
+      noteList.map((note, index) => <Note key={index} id={note.id}/>)
 
   const SEOUL_BOUNDS = {
     minLng: 126.764,

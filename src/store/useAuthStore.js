@@ -18,7 +18,7 @@ export const useAuthStore = create(set => ({
 
   initialize: () => {
     const token = sessionStorage.getItem('token')
-    const userId = sessionStorage.getItem('userId')
+    const userId = Number(sessionStorage.getItem('userId'))
 
     if (token && userId) {
       set({token: token, userId: userId})

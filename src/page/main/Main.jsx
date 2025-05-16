@@ -27,7 +27,7 @@ const Main = () => {
 
         <div className="infoPanel">
           <div className="infoSection">
-            <div className="infoTitle">챗봇</div>
+            <div className="infoTitle"></div>
             <ChatBot/>
           </div>
 

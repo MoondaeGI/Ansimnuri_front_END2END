@@ -10,9 +10,9 @@ export const parseDate = (date) => {
     } else if (minusTime < HOUR) {
         return "1시간 전"
     } else if (minusTime < DAY) {
-        return date.getHours() + " : " + date.getMinutes() + " : " + date.getSeconds()
+        return parsedDate.toDateString()
     } else {
-        return date.getFullYear() + '.' + date.getMonth() + '.' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes()
+        return parsedDate.toLocaleDateString()
     }
 }
 
