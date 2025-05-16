@@ -149,19 +149,6 @@
       flex-direction: column;
     }
   
-    .chatListPanel {
-      width: 100%;
-      height: 200px;
-      border-right: none;
-      border-bottom: 1px solid #ddd;
-    }
-  
-    .infoPanel {
-      width: 100%;
-      border-left: none;
-      border-top: 1px solid #ddd;
-    }
-  
     .chatSection {
       height: 250px;
     }

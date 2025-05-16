@@ -34,12 +34,7 @@ const Main = () => {
         </div>
       </div>
 
-      <div className="chatSection">
-        <div className="chatTitle">채팅</div>
-        <div className="chatInput">
-          <input type="text" placeholder="메시지를 입력하세요" />
-        </div>
-      </div>
+      
     </div>
     
   );
