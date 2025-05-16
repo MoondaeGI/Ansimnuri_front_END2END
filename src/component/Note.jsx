@@ -218,7 +218,7 @@ export const NoteList = () => {
                         setSelectedNote(note);
                     }}
                 >
-                    <div className="marker">📍</div>  {/* 마커 스타일링을 위한 div 추가 */}
+                    <div className="marker"></div>  {/* 마커 스타일링을 위한 div 추가 */}
                 </Marker>
             ))}
 
@@ -229,9 +229,9 @@ export const NoteList = () => {
                     latitude={selectedNote.latitude}
                     anchor="bottom"
                     closeButton={false}
-                    closeOnClick={false}      // 맵 클릭 시 팝업 닫기 방지
-                    closeOnMove={false}       // 맵 이동 시 팝업 닫기 방지
-                    onClick={(e) => {         // 팝업 내부 클릭 이벤트 처리
+                    closeOnClick={false}
+                    closeOnMove={false}
+                    onClick={(e) => {
                         e.stopPropagation();
                     }}
                     interactive={true}
