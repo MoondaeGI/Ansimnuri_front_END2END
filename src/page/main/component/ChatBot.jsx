@@ -1,4 +1,3 @@
-// ChatBot.jsx
 import React, { useState, useRef, useEffect } from "react";
 import "./css/ChatBot.css";
 
@@ -86,18 +85,40 @@ export const ChatBot = () => {
       try {
         const res = await fetch(`http://localhost:80/chatBot/police?keyword=${encodeURIComponent(input)}`);
         const policeList = await res.json();
-
-        const formatted = Array.isArray(policeList) && policeList.length > 0
-          ? policeList.map((p, i) => `${i + 1}. ${p.name} (${p.address})`).join("\n")
-          : "해당 지역에 대한 경찰서 정보를 찾을 수 없습니다.";
-
-        setChatLog([...updated, { role: "assistant", content: formatted }]);
+    
+        if (Array.isArray(policeList) && policeList.length === 0) {
+          const gptRes = await fetch("http://localhost:80/chatBot/api", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [
+                {
+                  role: "system",
+                  content: "당신은 서울의 지리 정보를 잘 아는 챗봇입니다. 사용자가 찾은 지역에 경찰서가 없으면, 예와 같이 부드럽게 안내해 주세요. 예: '해당 지역엔 경찰서 정보가 없어요. 다른 동으로 입력해주시면 누리봇이 도와드릴께요! 😇'"
+                },
+                {
+                  role: "user",
+                  content: `"${input}"이라는 지역에는 경찰서가 없다면, 어떻게 안내해줄 수 있을까?`
+                }
+              ]
+            })
+          });
+    
+          const gptData = await gptRes.json();
+          const gptContent = gptData.choices?.[0]?.message?.content || "해당 동네의 경찰서 정보를 찾을 수 없어요.";
+    
+          setChatLog([...updated, { role: "assistant", content: gptContent }]);
+        } else {
+          const formatted = policeList.map((p, i) => `${i + 1}. ${p.name} (${p.address})`).join("\n");
+          setChatLog([...updated, { role: "assistant", content: formatted }]);
+        }
       } catch (error) {
         console.error("경찰서 조회 실패:", error);
         setChatLog([...updated, { role: "assistant", content: "오류가 발생했습니다. 다시 시도해주세요." }]);
       }
       return;
     }
+    
 
     let endpoint = null;
     if (selectedMainMenu === "범죄 피해 대처 요령") endpoint = "guide";
@@ -107,7 +128,32 @@ export const ChatBot = () => {
     if (endpoint) {
       const res = await fetch(`http://localhost:80/chatBot/${endpoint}?question=${encodeURIComponent(input)}`);
       const answer = await res.text();
-      setChatLog([...updated, { role: "assistant", content: answer }]);
+  
+      if (!answer || answer.includes("없습니다")) {
+        const gptRes = await fetch("http://localhost:80/chatBot/api", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: "system",
+                content: "당신은 범죄 피해 지원 및 대처 요령, FAQ에 대한 내용을 친절히 설명하는 한국어 챗봇입니다. 질문에 맞는 정보가 없을 경우에도 부드럽게 안내해주세요."
+              },
+              {
+                role: "user",
+                content: `"${input}"이라는 질문에 대한 정보가 없을 경우 사용자에게 어떻게 안내해줄 수 있을까?`
+              }
+            ]
+          })
+        });
+  
+        const gptData = await gptRes.json();
+        const gptContent = gptData.choices?.[0]?.message?.content || "해당 정보는 아직 준비되지 않았어요. 조금만 기다려 주세요!";
+  
+        setChatLog([...updated, { role: "assistant", content: gptContent }]);
+      } else {
+        setChatLog([...updated, { role: "assistant", content: answer }]);
+      }
       return;
     }
 
@@ -213,7 +259,7 @@ export const ChatBot = () => {
         <input
           type="text"
           className="chat-input"
-          placeholder={policeSearchMode ? "예: 강남구, 신림, 서원동" : "챗봇의 도움이 필요하신가요?"}
+          placeholder={policeSearchMode ? "예: 강남구, 신림, 삼성동" : "챗봇의 도움이 필요하신가요?"}
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendQuestion(question)}
