@@ -1,33 +1,30 @@
-import { Note, NoteList } from "../../../component";
+import { NoteList, Button } from "../../../component";
 import {useNoteStore} from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import axios from 'axios';
-import { useMemo } from "react";
 import { Geocoder } from '@mapbox/search-js-react';
 import { Map as MapGL, Marker } from 'react-map-gl/mapbox';
+import * as mapboxgl from 'mapbox-gl';
 
 export const Map = () => {
-  const {noteList, setNoteList, connect} = useNoteStore()
-  
+  const {setNoteList, connect} = useNoteStore()
+
   useEffect(() => {
     axios.get('http://localhost:80/api/note')
-    .then(resp => {
-      setNoteList(resp.data)
-    })
+        .then(resp => {
+          setNoteList(resp.data)
+        })
   }, [])
 
   useEffect(() => {
     const reConnect = setInterval(() => {
-        connect()
+      connect()
     }, 1000)
 
     return clearInterval(reConnect)
   }, [connect])
-
-  const noteComponentList =
-      noteList.map((note, index) => <Note key={index} id={note.id}/>)
 
   const SEOUL_BOUNDS = {
     minLng: 126.764,
@@ -44,6 +41,8 @@ export const Map = () => {
   const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
   const SeoulMap3D = () => {
+    const [userLocation, setUserLocation] = useState(null);
+    const [searchMarker, setSearchMarker] = useState(null);
     const mapRef = useRef(null);
     const [markerPos, setMarkerPos] = useState(null);
     const [streetlights, setStreetlights] = useState([]);
@@ -66,6 +65,24 @@ export const Map = () => {
         properties: { id: p.id, name: p.name }
       }))
     });
+
+    const handleGeolocate = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+              const { latitude, longitude } = coords;
+              setUserLocation({ latitude, longitude });
+              setViewState(vs => ({ ...vs, latitude, longitude, zoom: 14 }));
+            },
+            err => {
+              alert('현재 위치를 가져올 수 없습니다.');
+            },
+            { enableHighAccuracy: true }
+        );
+      } else {
+        alert('GPS를 지원하지 않는 브라우저입니다.');
+      }
+    };
 
     useEffect(() => {
       axios.get("http://localhost/api/map/police").then((resp => {
@@ -157,9 +174,9 @@ export const Map = () => {
         layers.forEach(layer => {
           if (layer.type === 'symbol' && layer.layout?.['text-field']) {
             map.setLayoutProperty(
-              layer.id,
-              'text-field',
-              ['coalesce', ['get', 'name_ko'], ['get', 'name']]
+                layer.id,
+                'text-field',
+                ['coalesce', ['get', 'name_ko'], ['get', 'name']]
             );
           }
         });
@@ -178,9 +195,9 @@ export const Map = () => {
       if (!map || !map.getSource('police-stations')) return;
       map.getSource('police-stations').setData(toGeoJSON(streetlights));
       map.setLayoutProperty(
-        'police-layer',
-        'visibility',
-        showLights ? 'visible' : 'none'
+          'police-layer',
+          'visibility',
+          showLights ? 'visible' : 'none'
       );
     }, [streetlights, showLights]);
 
@@ -192,84 +209,108 @@ export const Map = () => {
         ...SEOUL_CENTER
       }));
     }, []);
-    
+
 
     return (
-      <div style={{ position: 'relative', width: '100%', height: '600px' }}>
-        {mapRef.current?.getMap() && (
-          // <SearchBox
-          //   accessToken={MAPBOX_TOKEN}
-          //   map={mapRef.current.getMap()}
-          //   onSelect={handleSearchSelect}
-          //   options={{
-          //     language: 'ko',
-          //     countries: ['kr'],
-          //     bbox: [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat, SEOUL_BOUNDS.maxLng, SEOUL_BOUNDS.maxLat],
-          //   }}
-          //   placeholder="장소 검색..."
-          // />
-        <Geocoder
-          accessToken={MAPBOX_TOKEN}
-          map={mapRef.current.getMap()}
-          options={{
-            countries: ['kr'],
-            language: 'ko',
-            types: ['address', 'postcode'],
-            autocomplete: true,
-            fuzzyMatch: true,
-            proximity: { lng: 126.9768, lat: 37.5785 },
-            limit: 5
-          }}
-          onResult={({ result }) => {
-            const [lon, lat] = result.center;
-            setViewState({ longitude: lon, latitude: lat, zoom:16, pitch:45 });
-            setMarkerPos({ longitude: lon, latitude: lat });
-          }}
-          placeholder="주소 검색..."
-        />
-        )}
-        <MapGL
-          {...viewState}
-          ref={mapRef}
-          onMove={handleMove}
-          onLoad={onMapLoad}
-          mapStyle="mapbox://styles/mapbox/streets-v11"
-          mapboxAccessToken={MAPBOX_TOKEN}
-          transitionDuration={500}
-          minZoom={10}
-          maxZoom={18}
-        >
-          <NoteList />
-        </MapGL>
-        <button
-          onClick={toggleView}
-          style={{
-            position: 'absolute', top: 95, right: 10, zIndex: 1,
-            padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #ddd',
-            borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', color: '#333'
-          }}>
-          {viewState.pitch > 0 ? '2D 보기' : '3D 보기'}
-        </button>
-        <button
-          onClick={() => setShowLights(v => !v)}
-          style={{
-            position: 'absolute', top: 45, right: 10, zIndex: 1,
-            padding: '8px 12px', background: '#fff', border: '1px solid #ddd',
-            cursor: 'pointer'
-          }}
-        >
-          {showLights ? '지구대 숨기기' : '지구대 보기'}
-        </button>
-      </div>
+        <div style={{ position: 'relative', width: '100%', height: '600px' }}>
+          {mapRef.current?.getMap() && (
+              // <SearchBox
+              //   accessToken={MAPBOX_TOKEN}
+              //   map={mapRef.current.getMap()}
+              //   onSelect={handleSearchSelect}
+              //   options={{
+              //     language: 'ko',
+              //     countries: ['kr'],
+              //     bbox: [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat, SEOUL_BOUNDS.maxLng, SEOUL_BOUNDS.maxLat],
+              //   }}
+              //   placeholder="장소 검색..."
+              // />
+              <Geocoder
+                  accessToken={MAPBOX_TOKEN}
+                  map={mapRef.current.getMap()}
+                  options={{
+                    countries: ['kr'],
+                    language: 'ko',
+                    types: ['address', 'postcode'],
+                    autocomplete: true,
+                    fuzzyMatch: true,
+                    proximity: { lng: 126.9768, lat: 37.5785 },
+                    limit: 5
+                  }}
+                  onResult={({ result }) => {
+                    const [lon, lat] = result.center;
+                    setViewState({ longitude: lon, latitude: lat, zoom:16, pitch:45 });
+                    setMarkerPos({ longitude: lon, latitude: lat });
+                  }}
+                  placeholder="주소 검색..."
+              />
+          )}
+          <MapGL
+              {...viewState}
+              ref={mapRef}
+              onMove={handleMove}
+              onLoad={onMapLoad}
+              mapStyle="mapbox://styles/mapbox/streets-v11"
+              mapboxAccessToken={MAPBOX_TOKEN}
+              transitionDuration={500}
+              minZoom={10}
+              maxZoom={18}
+          >
+            <NoteList />
+          </MapGL>
+          <button
+              onClick={toggleView}
+              style={{
+                position: 'absolute', top: 95, right: 10, zIndex: 1,
+                padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #ddd',
+                borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', color: '#333'
+              }}>
+            {viewState.pitch > 0 ? '2D 보기' : '3D 보기'}
+          </button>
+          <button
+              onClick={() => setShowLights(v => !v)}
+              style={{
+                position: 'absolute', top: 45, right: 10, zIndex: 1,
+                padding: '8px 12px', background: '#fff', border: '1px solid #ddd',
+                cursor: 'pointer'
+              }}
+          >
+            {showLights ? '지구대 숨기기' : '지구대 보기'}
+          </button>
+          <button
+              className="gps-button"
+              onClick={handleGeolocate}
+              title="현재 위치 보기"
+              style={{
+                position: 'absolute',
+                top: 140,
+                right: 15,
+                zIndex: 2,
+                padding: '8px',
+                background: '#fff',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+          >GPS
+          </button>
+        </div>
     );
   };
 
   return (
-    <div>
-      <SeoulMap3D />
-      <div style={{ margin: '20px auto', maxWidth: '800px' }}>
-      </div>
-    </div>
+      <>
+        <div>
+          <SeoulMap3D />
+          <div style={{ margin: '20px auto', maxWidth: '800px' }}>
+          </div>
+        </div>
+        <div className="mt-4">
+          <Button>쪽지</Button>
+          <Button>길찾기</Button>
+        </div>
+      </>
   );
 };
