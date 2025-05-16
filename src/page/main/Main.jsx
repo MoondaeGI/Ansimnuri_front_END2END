@@ -50,7 +50,7 @@ const Main = () => {
               <div className="infoTitle">
                 <div className="chatbotHeader">
                   <span>안심 챗봇</span>
-                  <button onClick={toggleChatBot}>✕</button>
+                
                 </div>
               </div>
               <ChatBot />
