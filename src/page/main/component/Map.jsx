@@ -1,33 +1,35 @@
+import './css/Map.css';
 import { Note } from "../../../component";
-import {useNoteStore} from "../../../store";
+import { useNoteStore } from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import axios from 'axios';
 import { useMemo } from "react";
 import { Geocoder } from '@mapbox/search-js-react';
-import { Map as MapGL, Marker } from 'react-map-gl/mapbox';
+import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
+import * as mapboxgl from 'mapbox-gl';
 
 export const Map = () => {
-  const {noteList, setNoteList, connect} = useNoteStore()
-  
+  const { noteList, setNoteList, connect } = useNoteStore()
+
   useEffect(() => {
     axios.get('http://localhost:80/api/note')
-    .then(resp => {
-      setNoteList(resp.data)
-    })
+      .then(resp => {
+        setNoteList(resp.data)
+      })
   }, [])
 
   useEffect(() => {
     const reConnect = setInterval(() => {
-        connect()
+      connect()
     }, 1000)
 
     return clearInterval(reConnect)
   }, [connect])
 
   const noteComponentList =
-      noteList.map((note, index) => <Note key={index} id={note.id}/>)
+    noteList.map((note, index) => <Note key={index} id={note.id} />)
 
   const SEOUL_BOUNDS = {
     minLng: 126.764,
@@ -44,6 +46,8 @@ export const Map = () => {
   const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
   const SeoulMap3D = () => {
+    const [userLocation, setUserLocation] = useState(null);
+    const [searchMarker, setSearchMarker] = useState(null);
     const mapRef = useRef(null);
     const [markerPos, setMarkerPos] = useState(null);
     const [streetlights, setStreetlights] = useState([]);
@@ -63,13 +67,31 @@ export const Map = () => {
           type: 'Point',
           coordinates: [p.latitude, p.longitude]
         },
-        properties: { id: p.id, name: p.name }
+        properties: { id: p.id, name: p.name, address: p.address, type: p.type }
       }))
     });
 
+    const handleGeolocate = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            const { latitude, longitude } = coords;
+            setUserLocation({ latitude, longitude });
+            setViewState(vs => ({ ...vs, latitude, longitude, zoom: 14 }));
+          },
+          err => {
+            alert('현재 위치를 가져올 수 없습니다.');
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        alert('GPS를 지원하지 않는 브라우저입니다.');
+      }
+    };
+
     useEffect(() => {
       axios.get("http://localhost/api/map/police").then((resp => {
-        console.log(resp);
+        console.log(resp.data);
         setStreetlights(resp.data);
       }))
     }, []);
@@ -138,6 +160,19 @@ export const Map = () => {
           }
         });
       }
+      // 클릭 시 팝업
+      map.on('click', 'police-layer', e => {
+        const f = e.features[0];
+        const [lng, lat] = f.geometry.coordinates;
+        const { name, address, type } = f.properties;
+        new mapboxgl.Popup()
+          .setLngLat([lng, lat])
+          .setHTML(`이름 : ${name} ${type} <br/> 주소 : ${address}`)
+          .addTo(map);
+      });
+      // 커서 포인터
+      map.on('mouseenter', 'police-layer', () => map.getCanvas().style.cursor = 'pointer');
+      map.on('mouseleave', 'police-layer', () => map.getCanvas().style.cursor = '');
 
       // 지형 설정
       try {
@@ -164,8 +199,6 @@ export const Map = () => {
           }
         });
       }, 1000);
-
-
       // 지도 이동 제한 설정
       map.setMaxBounds([
         [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat],
@@ -192,7 +225,7 @@ export const Map = () => {
         ...SEOUL_CENTER
       }));
     }, []);
-    
+
 
     return (
       <div style={{ position: 'relative', width: '100%', height: '600px' }}>
@@ -208,25 +241,25 @@ export const Map = () => {
           //   }}
           //   placeholder="장소 검색..."
           // />
-        <Geocoder
-          accessToken={MAPBOX_TOKEN}
-          map={mapRef.current.getMap()}
-          options={{
-            countries: ['kr'],
-            language: 'ko',
-            types: ['address', 'postcode'],
-            autocomplete: true,
-            fuzzyMatch: true,
-            proximity: { lng: 126.9768, lat: 37.5785 },
-            limit: 5
-          }}
-          onResult={({ result }) => {
-            const [lon, lat] = result.center;
-            setViewState({ longitude: lon, latitude: lat, zoom:16, pitch:45 });
-            setMarkerPos({ longitude: lon, latitude: lat });
-          }}
-          placeholder="주소 검색..."
-        />
+          <Geocoder
+            accessToken={MAPBOX_TOKEN}
+            map={mapRef.current.getMap()}
+            options={{
+              countries: ['kr'],
+              language: 'ko',
+              types: ['address', 'postcode'],
+              autocomplete: true,
+              fuzzyMatch: true,
+              proximity: { lng: 126.9768, lat: 37.5785 },
+              limit: 5
+            }}
+            onResult={({ result }) => {
+              const [lon, lat] = result.center;
+              setViewState({ longitude: lon, latitude: lat, zoom: 16, pitch: 45 });
+              setMarkerPos({ longitude: lon, latitude: lat });
+            }}
+            placeholder="주소 검색..."
+          />
         )}
         <MapGL
           {...viewState}
@@ -253,6 +286,24 @@ export const Map = () => {
               }} />
             </Marker>
           )}
+          {searchMarker && (
+            <Marker
+              longitude={searchMarker.longitude}
+              latitude={searchMarker.latitude}
+              anchor="bottom"
+            >
+              <div className="search-marker" />
+            </Marker>
+          )}
+          {userLocation && (
+            <Marker
+              longitude={userLocation.longitude}
+              latitude={userLocation.latitude}
+              anchor="bottom"
+            >
+              <div className="user-marker" />
+            </Marker>
+          )}
         </MapGL>
         <button
           onClick={toggleView}
@@ -260,7 +311,7 @@ export const Map = () => {
             position: 'absolute', top: 95, right: 10, zIndex: 1,
             padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #ddd',
             borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', color: '#333'
+            cursor: 'pointer', fontSize: '14px'
           }}>
           {viewState.pitch > 0 ? '2D 보기' : '3D 보기'}
         </button>
@@ -273,6 +324,24 @@ export const Map = () => {
           }}
         >
           {showLights ? '지구대 숨기기' : '지구대 보기'}
+        </button>
+        <button
+          className="gps-button"
+          onClick={handleGeolocate}
+          title="현재 위치 보기"
+          style={{
+            position: 'absolute',
+            top: 140,
+            right: 15,
+            zIndex: 2,
+            padding: '8px',
+            background: '#fff',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '16px'
+          }}
+        >GPS
         </button>
       </div>
     );
