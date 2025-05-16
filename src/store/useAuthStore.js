@@ -4,23 +4,24 @@ export const useAuthStore = create(set => ({
   token: null,
   userId: null,
 
-  setAuth: (token, loginId) => {
-    set({token: token, loginId: loginId})
+  setAuth: (token, userId) => {
+    set({token: token, userId: userId})
     sessionStorage.setItem('token', token)
-    sessionStorage.setItem('loginId', loginId)
+    sessionStorage.setItem('userId', userId)
   },
 
   logout: () => {
     set({token: null, userId: null})
     sessionStorage.removeItem('token')
-
+    sessionStorage.removeItem('userId')
   },
 
   initialize: () => {
     const token = sessionStorage.getItem('token')
+    const userId = Number(sessionStorage.getItem('userId'))
 
-    if (token) {
-      set({token})
+    if (token && userId) {
+      set({token: token, userId: userId})
     }
   },
 }))

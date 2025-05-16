@@ -1,46 +1,50 @@
 import {parseDate} from "../util";
 import {Button} from "../component";
 import {useState} from "react";
-import axios from "axios";
+import caxios from "../lib/caxios";
 import "./css/Note.css";
+import {useAuthStore, useNoteStore } from "../store";
 
-export const Note = ({dto}) => {
-    const {id, content, userId, nickname, regDate, recCount, replyCount} = dto
+export const Note = ({id: _id}) => {
+    const dto = useNoteStore(state => state.noteList.find(note => note.id == _id))
+    console.log(dto)
+
+    const {id, content, userId, nickname, latitude, longitude, regDate, recCount, replyCount} = dto
     const date = parseDate(regDate)
 
-    const [form, setForm] = useState({
-        id: id,
-        content: content,
-        userId: userId
-    })
+    const loginId = useAuthStore(state => state.userId)
+
+    const [form, setForm] = useState(() =>({...dto}))
     const [replyList, setReplyList] = useState([])
     const [isUpdate, setIsUpdate] = useState(false)
 
-    function toggleUpdateForm(e) {
-        e.preventDefault();
+    function toggleUpdateForm() {
         setIsUpdate(!isUpdate)
     }
 
     function update(e) {
         e.preventDefault();
-        axios.put('http://localhost/api/note', form)
+        caxios.put('/api/note', form)
             .then(res => {
-                console.log(res)
+                alert("수정이 완료되었습니다.")
+                toggleUpdateForm()
             })
     }
 
     function deleteById(e) {
         e.preventDefault();
-        axios.delete('http://localhost/api/note/' + id)
-            .then(res => {
-                console.log(res)
-            })
+        if(window.confirm("해당 쪽지를 삭제하시겠습니까?")) {
+            caxios.delete('/api/note/' + id)
+                .then(res => {
+                    alert("삭제되었습니다.")
+                })
+        }
     }
 
     function openReply(e) {
         e.preventDefault();
 
-        axios.get('http://localhost/api/note/reply/' + id)
+        caxios.get('/api/note/reply/' + id)
             .then(res => {
                 console.log(res)
                 setReplyList(prev =>
@@ -48,7 +52,7 @@ export const Note = ({dto}) => {
                         <NoteReply key={reply.id} dto={reply} />)
                 )
             })
-            .catch(ignore => {})
+            .catch(ignored => {})
     }
 
     const noteContent = () => {
@@ -58,15 +62,22 @@ export const Note = ({dto}) => {
                     <span className="badge bg-secondary">#{id}</span>
                     <small className="text-muted">{date}</small>
                 </div>
-                <h1 className="card-text mb-3">{content}</h1>
+                <h1 className="card-text mb-3">{form.content}</h1>
                 <div className="mb-2">
                     <small className="text-muted me-2">작성자: {nickname}</small>
                     <small className="text-muted">추천: {recCount}</small>
                 </div>
-                <div className="d-flex justify-content-end mb-3">
-                    <Button className="btn btn-outline-primary btn-sm me-2" onClick={toggleUpdateForm}>수정</Button>
-                    <Button className="btn btn-outline-secondary btn-sm" onClick={deleteById}>삭제</Button>
-                </div>
+                {(loginId && loginId === userId) && (
+                    <div className="d-flex justify-content-end mb-3">
+                        <Button className="btn btn-outline-primary btn-sm me-2"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleUpdateForm();
+                                }
+                                }>수정</Button>
+                        <Button className="btn btn-outline-secondary btn-sm" onClick={deleteById}>삭제</Button>
+                    </div>
+                )}
             </>
         );
     }
@@ -88,7 +99,11 @@ export const Note = ({dto}) => {
                 </div>
                 <div className="d-flex justify-content-end mb-3">
                     <Button className="btn btn-primary btn-sm me-2" onClick={update}>수정완료</Button>
-                    <Button className="btn btn-danger btn-sm" onClick={toggleUpdateForm}>돌아가기</Button>
+                    <Button className="btn btn-danger btn-sm"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                toggleUpdateForm()}
+                            }>돌아가기</Button>
                 </div>
             </>
         )
@@ -162,7 +177,7 @@ export const EmptyNote = ({latitude, longitude}) => {
 
     const save = (e) => {
         e.preventDefault();
-        axios.post('http://localhost/api/note', form)
+        caxios.post('/api/note', form)
             .then(res => {
                 console.log(res)
             })
