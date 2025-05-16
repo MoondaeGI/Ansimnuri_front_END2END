@@ -14,14 +14,7 @@ export const Note = ({id: _id}) => {
 
     const loginId = useAuthStore(state => state.userId)
 
-    const [form, setForm] = useState({
-        id: id,
-        latitude: latitude,
-        longitude: longitude,
-        content: content,
-        userId: userId
-    })
-
+    const [form, setForm] = useState(() =>({...dto}))
     const [replyList, setReplyList] = useState([])
     const [isUpdate, setIsUpdate] = useState(false)
 
