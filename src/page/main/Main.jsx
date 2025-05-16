@@ -9,12 +9,12 @@ const Main = () => {
   const [isNewsOpen, setIsNewsOpen] = useState(false);
   const [stepsEnabled, setStepsEnabled] = useState(false);
 
-  useEffect(() => {
-    const done = localStorage.getItem('isIntroDone');
-    if (done !== 'true') {
-      setStepsEnabled(true);
-    }
-  }, []);
+useEffect(() => {
+  const done = localStorage.getItem("isIntroDone");
+  if (done !== "true") {
+    setStepsEnabled(true);  
+  }
+}, []);
 
   const steps = [
     {
@@ -67,7 +67,7 @@ const Main = () => {
           }}
         />
 
-        {/* 뉴스 버튼 (step1) */}
+     
         <button className="newsToggleBtn step1" onClick={toggleNews}>
           📰
         </button>
@@ -92,7 +92,7 @@ const Main = () => {
           </div>
         </div>
 
-        {/* 챗봇 토글 버튼 (step3) */}
+    
         <button className="chatbotBtn step3" onClick={toggleChatBot}>
           💬
         </button>
