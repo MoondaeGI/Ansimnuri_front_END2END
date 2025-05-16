@@ -6,8 +6,8 @@ import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import axios from 'axios';
 import { useMemo } from "react";
 import { Geocoder } from '@mapbox/search-js-react';
-import { Map as MapGL, Marker } from 'react-map-gl/mapbox';
-import {Marker as M} from '../../../component'
+import { Map as MapGL } from 'react-map-gl/mapbox';
+import {Marker} from '../../../component'
 
 export const Map = () => {
   const {noteList, setNoteList, connect} = useNoteStore()
@@ -241,16 +241,11 @@ export const Map = () => {
           maxZoom={18}
         >
           {markerPos && (
-            <M
-              longitude={markerPos.longitude}
-              latitude={markerPos.latitude}
-              anchor="bottom"
-              color="#4287f5"
-            />
+              streetlights.map((light, index) => (
+                  <Marker key={index} longitude={light.longitude} latitude={light.latitude} />
+              ))
           )}
-
           <NoteList />
-
         </MapGL>
         <button
           onClick={toggleView}
