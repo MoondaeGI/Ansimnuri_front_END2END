@@ -1,4 +1,4 @@
-import { Note } from "../../../component";
+import { Note, NoteList } from "../../../component";
 import {useNoteStore} from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useMemo } from "react";
 import { Geocoder } from '@mapbox/search-js-react';
 import { Map as MapGL, Marker } from 'react-map-gl/mapbox';
+import {Marker as M} from '../../../component'
 
 export const Map = () => {
   const {noteList, setNoteList, connect} = useNoteStore()
@@ -240,19 +241,16 @@ export const Map = () => {
           maxZoom={18}
         >
           {markerPos && (
-            <Marker
+            <M
               longitude={markerPos.longitude}
               latitude={markerPos.latitude}
               anchor="bottom"
-            >
-              <div style={{
-                width: '24px', height: '24px',
-                backgroundColor: '#e74c3c',
-                borderRadius: '50%',
-                border: '2px solid white'
-              }} />
-            </Marker>
+              color="#4287f5"
+            />
           )}
+
+          <NoteList />
+
         </MapGL>
         <button
           onClick={toggleView}

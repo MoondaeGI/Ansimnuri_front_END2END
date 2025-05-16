@@ -4,6 +4,7 @@ import {useState} from "react";
 import caxios from "../lib/caxios";
 import "./css/Note.css";
 import {useAuthStore, useNoteStore } from "../store";
+import {Marker} from "react-map-gl/mapbox";
 
 export const Note = ({id: _id}) => {
     const dto = useNoteStore(state => state.noteList.find(note => note.id == _id))
@@ -196,6 +197,18 @@ export const EmptyNote = ({latitude, longitude}) => {
                     <Button oncClick={back}>취소</Button>
                 </div>
             </form>
+        </div>
+    )
+}
+
+export const NoteList = () => {
+    const noteList = useNoteStore(state => state.noteList)
+
+    return (
+        <div>
+            {noteList.map(note => (
+                <Marker key={note.id} latitude={note.latitude} longitude={note.longitude} />
+            ))}
         </div>
     )
 }
