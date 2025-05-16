@@ -3,19 +3,22 @@ import { Chat, ChatBot, Map, News } from './component';
 import './component/css/main.css';
 
 const Main = () => {
-
+ const [isChatBotOpen, setIsChatBotOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
 
+  const toggleChatBot = () => {
+    setIsChatBotOpen(prev => !prev);
+  };
   return (
     <div className="mainContainer">
       <div className="mainContent">
         <div className="chatListPanel">
           <div className="newsBox">
-           <p>뉴스</p>
+            <p>뉴스</p>
           </div>
 
           <div className="newsList">
-           <News/>
+            <News />
           </div>
         </div>
 
@@ -24,19 +27,27 @@ const Main = () => {
             <Map />
           </div>
         </div>
-
-        <div className="infoPanel">
-          <div className="infoSection">
-            <div className="infoTitle"></div>
-            <ChatBot/>
+        <button className="chatbotBtn" onClick={toggleChatBot}>
+          💬
+        </button>
+        {isChatBotOpen && (
+          <div className="infoPanel">
+            <div className="infoSection">
+              <div className="infoTitle">
+                <div className="chatbotHeader">
+                  <span>안심 챗봇</span>
+                  <button onClick={toggleChatBot}>✕</button>
+                </div>
+              </div>
+              <ChatBot />
+            </div>
           </div>
-
-        </div>
+        )}
       </div>
 
-      
+
     </div>
-    
+
   );
 };
 
