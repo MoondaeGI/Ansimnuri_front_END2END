@@ -233,6 +233,7 @@ const confirmAndCheck = () => {
       console.error(err);
     }
   };
+  // 유효성검사해서 true인 경우에 submit되도록 추가 코드 넣어줘야됨
 
   return (
     <div className="container">

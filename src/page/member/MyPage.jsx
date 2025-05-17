@@ -9,7 +9,6 @@ export const MyPage = () => {
   const [nicknameChecked, setNicknameChecked] = useState(false);
   const [newPassword, setNewPassword] = useState('');
 
-  const [sentCode, setSentCode] = useState('');
   const [isCodeVerified, setIsCodeVerified] = useState(false);
   const [beforePassword, setBeforePassword] = useState('');
   const [memberData, setMemberData] = useState({
@@ -180,9 +179,9 @@ if(window.confirm){
   if (!member) return <div>회원 정보를 불러오는 중...</div>;
 
   return (
-    <div className="mypage-container">
+    <div className="mypageContainer">
       <h2>마이페이지</h2>
-      <div className="info-box">
+      <div className="infoBox">
         <p><strong>아이디:</strong> {member.loginId}</p>
 
         <p><strong>권한:</strong> {member.role}</p>
@@ -219,7 +218,7 @@ if(window.confirm){
                 비밀번호가 기억나지 않으세요? 🤔
               </button>
               {forgotPwMode && (
-                <div className="forgot-password-box">
+                <div className="forgotPasswordBox">
                   {!emailVerified ? (
                     <>
                       <p>
