@@ -12,16 +12,13 @@ export const ChatBot = () => {
 
   useEffect(() => {
     if (chatEndRef.current) {
-      const last = chatLog[chatLog.length - 1];
-      const isContentMessage = last?.role === 'user' || last?.role === 'assistant';
-      if (isContentMessage) {
-        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatLog]);
 
   const menuOptions = [
     "🚔 지구대 / 경찰서 안내",
+    "🎤 최근 범죄 뉴스 TOP 3",
     "🏡 안전한 귀가 경로 추천",
     "🚨 범죄 피해 대처 요령",
     "💙 범죄 피해 지원 제도",
@@ -30,6 +27,8 @@ export const ChatBot = () => {
 
   const subMenus = {
     "🚔 지구대 / 경찰서 안내": [],
+    "🎤 최근 범죄 뉴스 TOP 3":[],
+    "🏡 안전한 귀가 경로 추천":[],
     "🚨 범죄 피해 대처 요령": [
       "강력범죄 피해시 대처요령",
       "성폭력 피해시 대처요령",
@@ -89,10 +88,18 @@ export const ChatBot = () => {
     }]);
   }, []);
 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 50);
+  };
+
   const resetChat = () => {
     setChatLog([{
       role: "assistant",
-      content: "안녕하세요! 저는 안심누리의 누리봇입니다. 어떤 도움이 필요하신가요?",
+      content: "안녕하세요! 누리봇이예요 🤗  어떤 도움이 필요하신가요? ❤️ ",
     }, {
       role: "menu",
       options: menuOptions
@@ -102,6 +109,7 @@ export const ChatBot = () => {
     setSelectedSubMenu(null);
     setPreviousMenu(null);
     setPoliceSearchMode(false);
+    scrollToBottom();
   };
 
   const handleMenuSelect = async (option) => {
@@ -121,6 +129,7 @@ export const ChatBot = () => {
         setSelectedMainMenu(previousMenu.parentMenu || null);
         setSelectedSubMenu(null);
         setPoliceSearchMode(previousMenu.parentMenu === "🚔 지구대 / 경찰서 안내");
+        scrollToBottom();
       } else {
         setSelectedMainMenu(null);
         setSelectedSubMenu(null);
@@ -129,6 +138,7 @@ export const ChatBot = () => {
           role: "menu",
           options: menuOptions
         }]);
+        scrollToBottom();
       }
       return;
     }
@@ -152,6 +162,7 @@ export const ChatBot = () => {
       };
       setPreviousMenu({ ...menuData });
       setChatLog(prev => [...prev, menuData]);
+      scrollToBottom();
     } else {
       handleFinalSelection(option, option);
     }
@@ -170,6 +181,7 @@ export const ChatBot = () => {
       };
       setPreviousMenu({ ...menuData });
       setChatLog(prev => [...prev, menuData]);
+      scrollToBottom();
     } else {
       handleFinalSelection(parentMenu, option);
     }
@@ -219,6 +231,7 @@ export const ChatBot = () => {
         const gptContent = gptData.choices?.[0]?.message?.content || "해당 정보는 아직 준비되지 않았어요. 조금만 기다려 주세요!";
 
         setChatLog(prev => [...prev, { role: "assistant", content: gptContent }]);
+        scrollToBottom();
         return;
       }
 
@@ -236,9 +249,11 @@ export const ChatBot = () => {
       };
 
       setChatLog(prev => [...prev, backButtons]);
+      scrollToBottom();
     } catch (err) {
       console.error("백엔드 호출 실패:", err);
       setChatLog(prev => [...prev, { role: "assistant", content: "서버 오류가 발생했어요 😥" }]);
+      scrollToBottom();
     }
   };
 
