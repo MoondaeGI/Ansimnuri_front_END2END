@@ -16,7 +16,7 @@ export const Login = () => {
   const [idVerified, setIdVerified] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [isCodeVerified, setIsCodeVerified] = useState(false);
-const [newLoginId, setNewLoginId] = useState('');
+  const [newLoginId, setNewLoginId] = useState('');
 
 
   const navigate = useNavigate();
@@ -78,7 +78,7 @@ const [newLoginId, setNewLoginId] = useState('');
       setEmailVerified(false);
       setIdVerified(false);
       setNewPassword('');
-     setIdForReset('');
+      setIdForReset('');
       setEmailForReset('');
 
     } catch (err) {
@@ -146,7 +146,7 @@ const [newLoginId, setNewLoginId] = useState('');
                   <p>
                     <strong>회원가입 시 입력한 아이디 입력:</strong>
                     <input
-                    
+
                       value={idForReset}
                       onChange={(e) => setIdForReset(e.target.value)}
                     />
@@ -160,7 +160,7 @@ const [newLoginId, setNewLoginId] = useState('');
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                     />
-                    <button type="button"onClick={changePasswordById}>비밀번호 재설정</button>
+                    <button type="button" onClick={changePasswordById}>비밀번호 재설정</button>
                   </p>
                 )}
               </div>
