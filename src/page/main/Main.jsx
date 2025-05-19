@@ -101,7 +101,6 @@ useEffect(() => {
           <div className="infoPanel">
             <div className="infoSection">
               <div className="chatbotHeader">
-                <span>안심 챗봇</span>
               </div>
               <ChatBot />
             </div>
