@@ -16,7 +16,7 @@ export const RegisterPage = () => {
     address: '',
     detailAddress: ''
   });
-
+const [isIdAvailable, setIsIdAvailable] = useState(null);
   const [pwMessage, setPwMessage] = useState('');
   const [pwMatchMessage, setPwMatchMessage] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
@@ -39,6 +39,9 @@ export const RegisterPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  if (name === 'loginId') {
+  setIsIdAvailable(null);
+}
 
     if (name === 'password') {
       const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{8,}$/;
@@ -66,6 +69,8 @@ export const RegisterPage = () => {
           : '이메일 형식이 아닙니다.'
       );
     }
+
+
   };
 
   const checkId = async () => {
@@ -81,16 +86,19 @@ export const RegisterPage = () => {
 
       if (exists) {
         alert("이미 사용 중인 아이디입니다.");
+              setIsIdAvailable(false);
         setForm({ ...form, loginId: '' });
         idInputRef.current.focus();
       } else {
         alert("사용 가능한 아이디입니다.");
+             setIsIdAvailable(true);
       }
     } catch (err) {
       alert("오류 발생");
       console.error(err);
     }
   };
+
 
   const checkNickName = async () => {
     if (!form.nickname) {
@@ -213,27 +221,58 @@ const confirmAndCheck = () => {
     }
   };
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { loginId, password, rePassword, nickname, email, postcode, address, detailAddress } = form;
 
+  // 정규식 검사
+  const pwValid = /^(?=.*[a-zA-Z])(?=.*\d).{8,}$/.test(password);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+ if (isIdAvailable === null) {
+    alert("아이디 중복 확인을 해주세요.");
+    idInputRef.current.focus();
+    return;
+  }
+   if (isIdAvailable === false) {
+    alert("이미 사용 중인 아이디입니다. 아이디를 다시 입력해주세요.");
+    idInputRef.current.focus();
+    return;
+  }
+  if (!loginId || !password || !rePassword || !nickname || !email || !postcode || !address || !detailAddress) {
+    alert("모든 필수 항목을 입력해주세요.");
+    return;
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { loginId, password, rePassword, nickname, email, postcode, address, detailAddress } = form;
+  if (!pwValid) {
+    alert("비밀번호는 8자 이상이며 영문과 숫자를 포함해야 합니다.");
+    return;
+  }
 
-    if (!loginId || !password || !rePassword || !nickname || !email || !postcode || !address || !detailAddress) {
-      alert("모든 필수 항목을 입력해주세요.");
-      return;
-    }
+  if (password !== rePassword) {
+    alert("비밀번호가 일치하지 않습니다.");
+    return;
+  }
 
-    try {
-      await axios.post('http://localhost:80/api/member/register', form);
-      alert('회원가입 성공');
-      navi("/");
-    } catch (err) {
-      alert('회원가입 실패');
-      console.error(err);
-    }
-  };
-  // 유효성검사해서 true인 경우에 submit되도록 추가 코드 넣어줘야됨
+  if (!emailValid) {
+    alert("올바른 이메일 형식이 아닙니다.");
+    return;
+  }
+
+  if (!agreements.terms || !agreements.privacy) {
+    alert("이용약관 및 개인정보 수집에 동의해주세요.");
+    return;
+  }
+
+  try {
+    await axios.post('http://localhost:80/api/member/register', form);
+    alert('회원가입 성공');
+    navi("/");
+  } catch (err) {
+    alert('회원가입 실패');
+    console.error(err);
+  }
+};
+
 
   return (
     <div className="container">

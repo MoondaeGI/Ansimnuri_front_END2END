@@ -16,7 +16,11 @@ export const Login = () => {
   const [idVerified, setIdVerified] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [isCodeVerified, setIsCodeVerified] = useState(false);
-const [newLoginId, setNewLoginId] = useState('');
+  const [newLoginId, setNewLoginId] = useState('');
+const KAKAO_REST_API_KEY = 'ff57aa7051dcd1d80b6e0f8fc712c345';
+const REDIRECT_URI = 'http://localhost:8080/oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
+
+const KAKAO_AUTH_URL = `http://localhost:8080/oauth2/authorization/kakao`;
 
 
   const navigate = useNavigate();
@@ -78,7 +82,7 @@ const [newLoginId, setNewLoginId] = useState('');
       setEmailVerified(false);
       setIdVerified(false);
       setNewPassword('');
-     setIdForReset('');
+      setIdForReset('');
       setEmailForReset('');
 
     } catch (err) {
@@ -132,6 +136,9 @@ const [newLoginId, setNewLoginId] = useState('');
         </div>
         <div>
           <button type="submit" disabled={forgotPwMode}>로그인</button>
+
+            <button type='button' onClick={()=>window.location.href= KAKAO_AUTH_URL}>카카오로 로그인</button>
+  
           <button type="button" onClick={handleRegister}>회원가입</button>
           <p>
             <button type="button" onClick={() => setForgotIdMode(true)} className="forgotIdBtn">
@@ -146,7 +153,7 @@ const [newLoginId, setNewLoginId] = useState('');
                   <p>
                     <strong>회원가입 시 입력한 아이디 입력:</strong>
                     <input
-                    
+
                       value={idForReset}
                       onChange={(e) => setIdForReset(e.target.value)}
                     />
@@ -160,7 +167,7 @@ const [newLoginId, setNewLoginId] = useState('');
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                     />
-                    <button type="button"onClick={changePasswordById}>비밀번호 재설정</button>
+                    <button type="button" onClick={changePasswordById}>비밀번호 재설정</button>
                   </p>
                 )}
               </div>
