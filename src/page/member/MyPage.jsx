@@ -192,12 +192,13 @@ if(window.confirm){
             <p>
               <strong>닉네임:</strong>
               <input name="nickname" value={memberData.nickname} onChange={handleChange} />
-              <button onClick={checkNickname}>중복 확인</button>
+              <button className="mypageBtn"onClick={checkNickname}>중복 확인</button>
             </p>
+    
             <p>
               <strong>우편번호:</strong>
               <input name="postcode" value={memberData.postcode} readOnly />
-              <button onClick={openAddressPopup}>우편번호 찾기</button>
+              <button className="mypageBtn"onClick={openAddressPopup}>우편번호 찾기</button>
             </p>
             <p>
               <strong>주소:</strong>
@@ -211,24 +212,28 @@ if(window.confirm){
               <p>
                 <strong>기존 비밀번호:</strong>
                 <input type="password" value={beforePassword} onChange={(e) => setBeforePassword(e.target.value)} />
-                <button onClick={checkPw}>비밀번호 확인</button>
+                <button className="mypageBtn"onClick={checkPw}>비밀번호 확인</button>
               </p>)}
             <p>
-              <button onClick={() => setForgotPwMode(true)} className="forgot-password-btn">
+              <span className="mypageBtn"onClick={() => setForgotPwMode(true)} >
                 비밀번호가 기억나지 않으세요? 🤔
-              </button>
+              </span>
               {forgotPwMode && (
                 <div className="forgotPasswordBox">
                   {!emailVerified ? (
                     <>
+                   
                       <p>
-                        <strong>회원가입 시 이메일 입력:</strong>
+                      <label style={{ display: 'block', marginBottom: '5px' }}>
+  회원가입 시 이메일 입력:
+</label>
                         <input
+                        className='emailCheck'
                           type="email"
                           value={emailForReset}
                           onChange={(e) => setEmailForReset(e.target.value)}
                         />
-                        <button onClick={handleCheckingEmail}>이메일 확인</button>
+                        <button className="mypageBtn" onClick={handleCheckingEmail}>이메일 확인</button>
                       </p>
                     </>
                   ) : (
@@ -240,7 +245,7 @@ if(window.confirm){
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                         />
-                        <button onClick={changePassword}>비밀번호 재설정</button>
+                        <button className="mypageBtn" onClick={changePassword}>비밀번호 재설정</button>
                       </p>
                     </>
                   )}
@@ -249,17 +254,20 @@ if(window.confirm){
             </p>
 
             {isCodeVerified && (
-              <p>
+              <div className='passwordBox'>
                 <strong>새 비밀번호:</strong>
                 <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                <button onClick={changePassword}>비밀번호 변경</button>
+                <button  className="mypageBtn" onClick={changePassword}>비밀번호 변경</button>
 
-              </p>
+             </div>
 
             )}
-            <button onClick={handleSave}>저장</button>
-            <button onClick={() => setEditMode(false)}>취소</button>
-            <button onClick={handelDelete}>회원 탈퇴</button>
+            <br></br>
+            <div className='pageBtnBox'>
+            <button className="mypageBtn" onClick={handleSave}>저장</button>
+            <button className="mypageBtn" onClick={() => setEditMode(false)}>취소</button>
+            <button className="mypageBtn" onClick={handelDelete}>회원 탈퇴</button>
+            </div>
           </>
         ) : (
           <>

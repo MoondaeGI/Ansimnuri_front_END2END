@@ -176,18 +176,17 @@ export const Login = () => {
         <div className='buttonBox'>
           <button type="submit" disabled={forgotPwMode}>로그인</button>
 
-
-          <div className="kakao" onClick={handleKakaoLogin}>
+          <button type="button" onClick={handleRegister}>회원가입</button>
+            <div className="kakao" onClick={handleKakaoLogin}>
             <img src='/icons/kakao.png' className="kakaoImg" />
           </div>
-          <button type="button" onClick={handleRegister}>회원가입</button>
-       
           <p>
-            <button type="button" onClick={() => setForgotIdMode(true)} className="forgotIdBtn">
-              아이디찾기            </button>
-            <button type="button" onClick={() => setForgotPwMode(true)} className="forgotPasswordBtn">
+            <span onClick={() => setForgotIdMode(true)} className="forgotIdBtn">
+              아이디찾기            </span>
+           
+            <span  onClick={() => setForgotPwMode(true)} className="forgotPasswordBtn">
               비밀번호찾기
-            </button>
+            </span>
             {forgotPwMode && (
               <div className="passwordBox">
                 {!idVerified ? (

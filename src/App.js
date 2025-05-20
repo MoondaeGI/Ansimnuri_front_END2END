@@ -12,7 +12,6 @@ import KakaoRedirect from './page/member/KakaoRedirect';
 
 import 'intro.js/introjs.css';
 
-import ArrowOverlay from './ArrowOverlay';
 function App() {
   const [expanded, setExpanded] = useState(false)
   const [showGuide, setShowGuide] = useState(false);
@@ -51,14 +50,14 @@ function App() {
     ,
     {
       element: ".step3",
-      title: "안심 챗봇",
-      intro: "위급상황 시 챗봇으로 빠르게 도움받기!"
+      title: "안심 챗봇 누리봇",
+      intro: "범죄 예방 및 피해자 지원을 위한 생활 안전 챗봇으로 원하는 정보를 손 쉽게 얻을 수 있어요 !"
     },
     {
       element: "#pwaTip",
       title: "앱 설치 안내",
       intro: `
-주소창 오른쪽에 있는 "홈 화면에 추가" 아이콘을 눌러<br />
+<img src="./icons/아이콘.png"><br>아이콘을 눌러<br />
 PWA 앱으로 설치할 수 있어요!<br />
 (아이콘은 브라우저에 따라 다르게 보일 수 있습니다)
     `
@@ -75,12 +74,12 @@ PWA 앱으로 설치할 수 있어요!<br />
 
   return (
     <Container fluid className="App p-0">
-      <ArrowOverlay visible={showGuide && currentStepIndex === 3} />
+  
 
       <div id="pwaTip" style={{
         position: 'absolute',
-        top: '120px',
-        right: '150px',
+        top: '0px',
+        right: '320px',
         zIndex: 9999
       }}>
 

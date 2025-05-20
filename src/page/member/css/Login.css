@@ -71,14 +71,14 @@
   cursor: pointer;
   transition: background 0.2s ease-in-out;
 }
+.forgotIdBtn {
+  margin-right: 10px;
+}
 
 .kakao:hover {
   background-color: #f7d600;
 }
 
-.kakaoImg {
-  height: 20px;
-}
 
 .passwordBox {
   margin-top: 12px;
