@@ -1,5 +1,4 @@
 import './css/Map.css';
-import {NoteList, SexOffenderList} from "../../../component";
 import { useNoteStore } from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
