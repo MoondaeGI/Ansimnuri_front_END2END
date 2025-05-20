@@ -264,7 +264,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    await axios.post('http://localhost:80/api/member/register', form);
+    await axios.post('http://localhost/api/member/register', form);
     alert('회원가입 성공');
     navi("/");
   } catch (err) {
@@ -276,9 +276,9 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="container">
-      <h2 className="text-xl font-bold mb-4">회원가입</h2>
-      <div className='innerBox'>
 
+      <div className='innerBox'>
+      <h2 className="text-xl font-bold mb-4">회원가입</h2>
         <form onSubmit={handleSubmit}>
           <div className='box'>
             <label className="formLabel">아이디</label> <input name="loginId" ref={idInputRef} placeholder="아이디" onChange={handleChange} className="input" />
@@ -297,7 +297,7 @@ const handleSubmit = async (e) => {
           <div className='box'>
             <label className="formLabel">닉네임</label><input name="nickname" ref={nickNameInputRef} placeholder="닉네임" onChange={handleChange} className="input" />
             <button className="btn" type='button' onClick={checkNickName}>중복확인</button>
-          </div><br />
+          </div>
           <div className='box'>
             <label className="formLabel">이메일</label><input type="email" name="email" onChange={handleChange} className="input" /></div><br />
           <div className="text-sm" style={{ color: emailMessage.includes('올바른') ? 'green' : 'red' }}>
@@ -306,10 +306,8 @@ const handleSubmit = async (e) => {
 
           <div className="box">
             <label className="formLabel">우편번호</label>
-
             <input type="text" className="input" name="postcode" value={form.postcode} readOnly />
             <button type="button" className="btn" onClick={handlePostcode}>검색</button>
-
           </div>
 
           <div className="box">
@@ -355,14 +353,12 @@ const handleSubmit = async (e) => {
         {showModal && (
           <div className="modalBackdrop" onClick={closeModal}>
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
-              <h3>약관 상세</h3>
+              <h3>상세 동의서</h3>
               <pre style={{ whiteSpace: 'pre-wrap' }}>{modalContent}</pre>
               <div className="modalButtons">
                 <button onClick={closeModal}>닫기</button>
                 <button onClick={confirmAndCheck}>확인</button>
               </div>
-
-
             </div>
           </div>
         )}

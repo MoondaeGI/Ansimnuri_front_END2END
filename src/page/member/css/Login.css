@@ -1,5 +1,5 @@
-.login-container {
-  max-width: 400px;
+.loginContainer {
+  max-width: 500px;
   margin: 80px auto;
   padding: 40px;
   background-color: #fff;
@@ -9,25 +9,28 @@
   animation: fadeIn 0.5s ease-in-out;
 }
 
-.login-container h2 {
+.loginContainer h2 {
   text-align: center;
   margin-bottom: 30px;
   color: #2c3e50;
 }
+/* .passwordBox{
 
-.login-container form div {
+} */
+
+.loginContainer form div {
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
 }
 
-.login-container label {
+.loginContainer label {
   margin-bottom: 8px;
   font-weight: bold;
   color: #34495e;
 }
 
-.login-container input {
+.loginContainer input {
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -35,13 +38,14 @@
   transition: border-color 0.3s;
 }
 
-.login-container input:focus {
+.loginContainer input:focus {
   border-color: #3498db;
   outline: none;
 }
 
-.login-container button {
-  width: 100%;
+.loginContainer button {
+  width: 70%;
+  height: 100%;
   padding: 10px;
   margin-top: 8px;
   border: none;
@@ -53,8 +57,53 @@
   cursor: pointer;
   transition: background-color 0.3s;
 }
+.buttonBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
 
-.login-container button:hover {
+.buttonBox button {
+  width: 200px;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #4a90e2;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.buttonBox button:hover {
+  background-color: #357ab7;
+}
+
+
+
+.kakao {
+  width: 200px;
+  height: 45px;
+  background-color: #FEE500;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.kakao:hover {
+  background-color: #e5cb00;
+}
+
+.kakaoImg {
+  height: 24px;
+}
+
+.loginContainer button:hover {
   background-color: #2980b9;
 }
 

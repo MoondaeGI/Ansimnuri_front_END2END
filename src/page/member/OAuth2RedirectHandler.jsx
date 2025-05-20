@@ -1,4 +1,4 @@
-// src/pages/OAuth2RedirectHandler.jsx
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store';
@@ -12,7 +12,7 @@ export const OAuth2RedirectHandler = () => {
     const token = url.searchParams.get('token');
     const id = url.searchParams.get('id');
 
-    if (token) {
+    if (token && id) {
       setAuth(token, id);
       localStorage.setItem('accessToken', token);
       navigate('/'); // 홈으로 이동
@@ -24,3 +24,4 @@ export const OAuth2RedirectHandler = () => {
 
   return <p>로그인 처리 중입니다...</p>;
 };
+export default OAuth2RedirectHandler;

@@ -4,12 +4,14 @@ import { Qna, Notice } from './page/board'
 import { Login, MyPage, RegisterPage } from './page/member'
 import { Routes, Route } from 'react-router-dom'
 import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
+import SimpleRegisterPage from './page/member/SimpleRegisterPage';
 import { useEffect, useState } from 'react'
 import { useAuthStore, useNoteStore } from './store'
 import { Steps } from 'intro.js-react';
+import KakaoRedirect from './page/member/KakaoRedirect';
 
 import 'intro.js/introjs.css';
-import { OAuth2RedirectHandler } from './page/member/OAuth2RedirectHandler';
+
 import ArrowOverlay from './ArrowOverlay';
 function App() {
   const [expanded, setExpanded] = useState(false)
@@ -84,11 +86,10 @@ PWA 앱으로 설치할 수 있어요!<br />
 
       </div>
 
-      {/* Header */}
       <Navbar expand="md" className="py-3" expanded={expanded} onToggle={setExpanded}>
         <Container>
           <Navbar.Brand href="/" className='nav' >
-            <img src="/icons/logo.png" alt="로고"className='logoImg' width={200}/>
+            <img src="/icons/logo.png" alt="로고" className='logoImg' width={200} />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
@@ -126,11 +127,14 @@ PWA 앱으로 설치할 수 있어요!<br />
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/login" element={<Login />} />
+          {/* <Route path="/oauth" element={<OAuth2RedirectHandler />} /> */}
+          <Route path="/login/oauth2/redirect" element={<KakaoRedirect />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/notice/*" element={<Notice />} />
+                  <Route path="/SimpleRegisterPage" element={<SimpleRegisterPage />} />
           <Route path="/qna/*" element={<Qna />} />
           <Route path="/RegisterPage/*" element={<RegisterPage />} />
-          <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+ 
         </Routes>
       </main>
 
@@ -147,9 +151,7 @@ PWA 앱으로 설치할 수 있어요!<br />
                 <Nav.Link className="text-light" href="/guide">
                   이용가이드
                 </Nav.Link>
-                <Nav.Link className="text-light" href="/download">
-                  앱 다운로드
-                </Nav.Link>
+             
                 <Nav.Link className="text-light" href="/notice/list">
                   공지사항
                 </Nav.Link>

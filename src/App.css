@@ -7,18 +7,9 @@ body,
   flex-direction: column;
   margin: 0;
   font-family: 'Noto Sans KR', sans-serif;
-  background-color: #f4f8fb;
+ 
   color: #1e3255;
 }
-
-main {
-  flex: 1;
-  padding: 2rem 1rem;
-  background-color: #1e3255;
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-
 
 
 .footer {
@@ -37,10 +28,24 @@ main {
 }
 
 .navbar {
-  background-color: #0c4666 !important;
+  background-color: #1e3255 !important;
   position: relative;
+    margin-left: 10px;
+   margin-right: 10px;
+   margin-top: 10px;
+   border-radius: 20px;
 }
 
+main {
+  flex: 1;
+  padding: 2rem 1rem;
+  background-color: whitesmoke;
+  border-radius: 8px;
+  margin-top: 1rem;
+  margin-left: 10px;
+   margin-right: 10px;
+     border-radius: 10px;
+}
 .logoImg {
   position: absolute;
   top: 18px;
