@@ -66,7 +66,6 @@ useEffect(() => {
             localStorage.setItem("isIntroDone", "true");
           }}
         />
-
      
         <button className="newsToggleBtn step1" onClick={toggleNews}>
           📰
@@ -101,9 +100,9 @@ useEffect(() => {
           <div className="infoPanel">
             <div className="infoSection">
               <div className="chatbotHeader">
-                <span>안심 챗봇</span>
-              </div>
+           
               <ChatBot />
+                 </div>
             </div>
           </div>
         )}

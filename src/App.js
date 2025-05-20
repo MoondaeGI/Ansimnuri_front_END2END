@@ -5,7 +5,7 @@ import { Login, MyPage, RegisterPage } from './page/member'
 import { Routes, Route } from 'react-router-dom'
 import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
 import { useEffect, useState } from 'react'
-import { useAuthStore, useNoteStore } from './store'
+import { useAuthStore } from './store'
 import { Steps } from 'intro.js-react';
 import 'intro.js/introjs.css';
 
@@ -13,11 +13,9 @@ function App() {
   const [expanded, setExpanded] = useState(false)
 
   const {token,initialize, logout } = useAuthStore();
-  const {connect} = useNoteStore();
 
   useEffect(() => {
       initialize();
-      connect();
   }, [])
 
   const handleLogout = () => {

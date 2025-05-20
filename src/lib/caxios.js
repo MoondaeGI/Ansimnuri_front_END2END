@@ -13,4 +13,21 @@ caxios.interceptors.request.use((config) => {
   return config;
 });
 
+caxios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const status = error.response.status;
+      switch (status) {
+        case 401:
+          window.alert(error.response.data.message);
+          break;
+        case 403:
+          window.alert(error.response.data.message);
+          break;
+      }
+
+      return Promise.reject(error);
+    }
+)
+
 export default caxios;

@@ -7,6 +7,8 @@ export const ChatBot = () => {
   const [selectedMainMenu, setSelectedMainMenu] = useState(null);
   const [selectedSubMenu, setSelectedSubMenu] = useState(null);
   const [policeSearchMode, setPoliceSearchMode] = useState(false);
+  const [previousMenu, setPreviousMenu] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -16,28 +18,31 @@ export const ChatBot = () => {
   }, [chatLog]);
 
   const menuOptions = [
-    "지구대 / 경찰서 안내",
-    "안전한 귀가 경로 추천",
-    "범죄 피해 대처 요령",
-    "범죄 피해 지원 제도",
-    "자주 묻는 질문 (FAQ)"
+    "🚔 지구대 / 경찰서 안내",
+    "📰 최근 범죄 뉴스 TOP 3",
+    "🏡 안전한 귀가 경로 추천",
+    "🚨 범죄 피해 대처 요령",
+    "💙 범죄 피해 지원 제도",
+    "💡 자주 묻는 질문 (FAQ)"
   ];
 
   const subMenus = {
-    "지구대 / 경찰서 안내": [],
-    "범죄 피해 대처 요령": [
-      "강력범죄 피해시 대처요령",
-      "성폭력 피해시 대처요령",
-      "가정폭력 피해시 대처요령",
-      "학교폭력 피해시 대처요령"
+    "🚔 지구대 / 경찰서 안내": [],
+    "📰 최근 범죄 뉴스 TOP 3":[],
+    "🏡 안전한 귀가 경로 추천":[],
+    "🚨 범죄 피해 대처 요령": [
+      "🔹 강력범죄 피해시 대처요령",
+      "🔹 성폭력 피해시 대처요령",
+      "🔹 가정폭력 피해시 대처요령",
+      "🔹 학교폭력 피해시 대처요령"
     ],
-    "범죄 피해 지원 제도": [
-      "경제적 지원제도",
-      "법률적 지원제도",
-      "심리치료 지원제도",
-      "주거 지원제도"
+    "💙 범죄 피해 지원 제도": [
+      "◼️ 경제적 지원제도",
+      "◼️ 법률적 지원제도",
+      "◼️ 심리치료 지원제도",
+      "◼️ 주거 지원제도"
     ],
-    "자주 묻는 질문 (FAQ)": [
+    "💡 자주 묻는 질문 (FAQ)": [
       "무슨 사이트인가요?",
       "이용 방법은?",
       "GPS 꺼도 되나요?",
@@ -47,89 +52,213 @@ export const ChatBot = () => {
   };
 
   const subDetailMenus = {
-    "경제적 지원제도": [
-      "범죄피해자구조금제도",
-      "긴급복지 지원제도",
-      "무보험차량·뺑소니 피해자 구조제도",
-      "이전비 지원제도",
-      "주거지원제도",
-      "자동차사고 피해가족 지원제도",
-      "배상명령제도",
-      "보험급여 지원제도"
+    "◼️ 경제적 지원제도": [
+      "◼️ 범죄피해자구조금제도",
+      "◼️ 긴급복지 지원제도",
+      "◼️ 무보험차량·뺑소니 피해자 구조제도",
+      "◼️ 이전비 지원제도",
+      "◼️ 주거지원제도",
+      "◼️ 자동차사고 피해가족 지원제도",
+      "◼️ 배상명령제도",
+      "◼️ 보험급여 지원제도"
     ],
-    "법률적 지원제도": [
-      "무료법률구조제도",
-      "형사조정제도",
-      "법률홈닥터",
-      "화해제도"
+    "◼️ 법률적 지원제도": [
+      "◼️ 무료법률구조제도",
+      "◼️ 형사조정제도",
+      "◼️ 법률홈닥터",
+      "◼️ 화해제도"
     ],
-    "심리치료 지원제도": [
-      "스마일센터를 통한 심리치료 지원",
-      "CARE(피해자심리전문요원)"
+    "◼️ 심리치료 지원제도": [
+      "◼️ 스마일센터를 통한 심리치료 지원",
+      "◼️ CARE(피해자심리전문요원)"
     ],
-    "주거 지원제도": [
-      "피해자 임시숙소 제도",
-      "성폭력피해자 보호시설",
-      "가정폭력피해자 보호시설"
+    "◼️ 주거 지원제도": [
+      "◼️ 피해자 임시숙소 제도",
+      "◼️ 성폭력피해자 보호시설",
+      "◼️ 가정폭력피해자 보호시설"
     ]
   };
 
-  const sendQuestion = async (input) => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    setChatLog([{
+      role: "assistant",
+      content: "안녕하세요! 누리봇이예요 🤗  어떤 도움이 필요하신가요? ❤️ ",
+    }, {
+      role: "menu",
+      options: menuOptions
+    }]);
+  }, []);
 
-    const updated = [...chatLog, { role: "user", content: input }];
-    setChatLog(updated);
-    setQuestion("");
-
-    if (policeSearchMode) {
-      try {
-        const res = await fetch(`http://localhost:80/chatBot/police?keyword=${encodeURIComponent(input)}`);
-        const policeList = await res.json();
-    
-        if (Array.isArray(policeList) && policeList.length === 0) {
-          const gptRes = await fetch("http://localhost:80/chatBot/api", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              messages: [
-                {
-                  role: "system",
-                  content: "당신은 서울의 지리 정보를 잘 아는 챗봇입니다. 사용자가 찾은 지역에 경찰서가 없으면, 예와 같이 부드럽게 안내해 주세요. 예: '해당 지역엔 경찰서 정보가 없어요. 다른 동으로 입력해주시면 누리봇이 도와드릴께요! 😇'"
-                },
-                {
-                  role: "user",
-                  content: `"${input}"이라는 지역에는 경찰서가 없다면, 어떻게 안내해줄 수 있을까?`
-                }
-              ]
-            })
-          });
-    
-          const gptData = await gptRes.json();
-          const gptContent = gptData.choices?.[0]?.message?.content || "해당 동네의 경찰서 정보를 찾을 수 없어요.";
-    
-          setChatLog([...updated, { role: "assistant", content: gptContent }]);
-        } else {
-          const formatted = policeList.map((p, i) => `${i + 1}. ${p.name} (${p.address})`).join("\n");
-          setChatLog([...updated, { role: "assistant", content: formatted }]);
-        }
-      } catch (error) {
-        console.error("경찰서 조회 실패:", error);
-        setChatLog([...updated, { role: "assistant", content: "오류가 발생했습니다. 다시 시도해주세요." }]);
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
       }
+    }, 50);
+  };
+
+  const resetChat = () => {
+    setChatLog([{
+      role: "assistant",
+      content: "안녕하세요! 누리봇이예요 🤗  어떤 도움이 필요하신가요? ❤️ ",
+    }, {
+      role: "menu",
+      options: menuOptions
+    }]);
+    setQuestion("");
+    setSelectedMainMenu(null);
+    setSelectedSubMenu(null);
+    setPreviousMenu(null);
+    setPoliceSearchMode(false);
+    scrollToBottom();
+  };
+
+  const handleMenuSelect = async (option) => {
+    if (option === "🏠 처음으로") {
+      resetChat();
       return;
     }
     
+    try {
+      await fetch("http://localhost:80/api/dashboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ menuName: option })
+      });
+    } catch (err) {
+      console.error("클릭 로그 전송 실패:", err);
+    }
 
-    let endpoint = null;
-    if (selectedMainMenu === "범죄 피해 대처 요령") endpoint = "guide";
-    if (selectedMainMenu === "범죄 피해 지원 제도" && selectedSubMenu) endpoint = "support";
-    if (selectedMainMenu === "자주 묻는 질문 (FAQ)") endpoint = "faq";
+    if (option === "🚩 이전으로") {
+      if (previousMenu) {
+        setChatLog(prev => [...prev, {
+          role: "menu",
+          options: previousMenu.options,
+          isSubMenu: previousMenu.isSubMenu,
+          isSubDetail: previousMenu.isSubDetail,
+          parentMenu: previousMenu.parentMenu
+        }]);
+        setSelectedMainMenu(previousMenu.parentMenu || null);
+        setSelectedSubMenu(null);
+        setPoliceSearchMode(previousMenu.parentMenu === "🚔 지구대 / 경찰서 안내");
+        scrollToBottom();
+      } else {
+        setSelectedMainMenu(null);
+        setSelectedSubMenu(null);
+        setPoliceSearchMode(false);
+        setChatLog(prev => [...prev, {
+          role: "menu",
+          options: menuOptions
+        }]);
+        scrollToBottom();
+      }
+      return;
+    }
+    setSelectedMainMenu(option);
+    setChatLog(prev => [...prev, { role: "user", content: option }]);
 
-    if (endpoint) {
-      const res = await fetch(`http://localhost:80/chatBot/${endpoint}?question=${encodeURIComponent(input)}`);
-      const answer = await res.text();
-  
-      if (!answer || answer.includes("없습니다")) {
+    if (option === "📰 최근 범죄 뉴스 TOP 3") {
+      try {
+        setIsLoading(true);
+
+        const res = await fetch("http://localhost:80/chatBot/news/top3");
+        const newsList = await res.json();
+        const summaryRes = await fetch("http://localhost:80/chatBot/news/summarize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newsList)
+        });
+    
+        const summaryList = await summaryRes.json();
+        const summaryHTML = summaryList.map(
+          (n, i) => `<p><strong>📅 제목:</strong> ${n.title}
+<strong>📌 주요 내용 요약:</strong> ${n.summary}
+<strong>🔗 기사 링크:</strong> <a href="${n.url}" target="_blank" rel="noopener noreferrer">${n.url}</a></p>`).join("");
+        
+        setChatLog(prev => [...prev, {
+          role: "assistant",
+          content: <div dangerouslySetInnerHTML={{ __html: summaryHTML }} />
+        },
+        {
+          role: "menu",
+          options: ["🏠 처음으로"]
+        }]);
+        scrollToBottom();
+      } catch (err) {
+        console.error("뉴스 요약 실패:", err);
+        setChatLog(prev => [...prev, { role: "assistant", content: "뉴스를 가져오지 못했어요 😥" }]);
+        scrollToBottom();
+      }finally {
+        setIsLoading(false);
+      }
+      return;
+    }    
+    
+    if (option === "🚔 지구대 / 경찰서 안내") {
+      setPoliceSearchMode(true);
+      setChatLog(prev => [...prev, { role: "assistant", content: `'${option}' 메뉴를 선택하셨습니다.
+안내받고 싶은 지역명을 입력해주세요.😊` }]);
+    } else {
+      setPoliceSearchMode(false);
+    }
+
+    if (subMenus[option]?.length > 0) {
+      const menuData = {
+        role: "menu",
+        options: subMenus[option],
+        isSubMenu: true,
+        parentMenu: option
+      };
+      setPreviousMenu({ ...menuData });
+      setChatLog(prev => [...prev, menuData]);
+      scrollToBottom();
+    } else {
+      handleFinalSelection(option, option);
+    }
+  };
+
+  const handleSubMenuSelect = async (parentMenu, option) => {
+    setSelectedSubMenu(option);
+    setChatLog(prev => [...prev, { role: "user", content: option }]);
+
+    if (subDetailMenus[option]) {
+      const menuData = {
+        role: "menu",
+        options: subDetailMenus[option],
+        isSubDetail: true,
+        parentMenu
+      };
+      setPreviousMenu({ ...menuData });
+      setChatLog(prev => [...prev, menuData]);
+      scrollToBottom();
+    } else {
+      handleFinalSelection(parentMenu, option);
+    }
+  };
+
+  const handleFinalSelection = (parentMenu, input) => {
+    if (parentMenu === "🚨 범죄 피해 대처 요령") {
+      fetchBackendAndRespond("guide", input);
+    } else if (parentMenu === "💙 범죄 피해 지원 제도") {
+      fetchBackendAndRespond("support", input);
+    } else if (parentMenu === "💡 자주 묻는 질문 (FAQ)") {
+      fetchBackendAndRespond("faq", input);
+    }
+  };
+
+  const fetchBackendAndRespond = async (endpoint, input) => {
+    try {
+      let url = `http://localhost:80/chatBot/${endpoint}`;
+      if (endpoint === "police") {
+        url += `?keyword=${encodeURIComponent(input)}`;
+      } else {
+        url += `?question=${encodeURIComponent(input)}`;
+      }
+      const res = await fetch(url);
+      const isJson = res.headers.get("content-type")?.includes("application/json");
+      const result = isJson ? await res.json() : await res.text();
+
+      if ((typeof result === "string" && (!result || result.includes("없습니다"))) || (Array.isArray(result) && result.length === 0)) {
         const gptRes = await fetch("http://localhost:80/chatBot/api", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -146,126 +275,98 @@ export const ChatBot = () => {
             ]
           })
         });
-  
+
         const gptData = await gptRes.json();
         const gptContent = gptData.choices?.[0]?.message?.content || "해당 정보는 아직 준비되지 않았어요. 조금만 기다려 주세요!";
-  
-        setChatLog([...updated, { role: "assistant", content: gptContent }]);
-      } else {
-        setChatLog([...updated, { role: "assistant", content: answer }]);
+
+        setChatLog(prev => [...prev, { role: "assistant", content: gptContent }]);
+        scrollToBottom();
+        return;
       }
-      return;
+
+      const backButtons = {
+        role: "assistant",
+        content: (
+          <div>
+            <div>{typeof result === 'string' ? result : result.map((p, i) => `${i + 1}. ${p.name} (${p.address})`).join("\n")}</div>
+            <div style={{ marginTop: '8px' }}>
+              <button className="chat-option-button" onClick={() => handleMenuSelect("🚩 이전으로")}>🚩 이전으로</button>
+              <button className="chat-option-button" onClick={() => handleMenuSelect("🏠 처음으로")}>🏠 처음으로</button>
+            </div>
+          </div>
+        )
+      };
+
+      setChatLog(prev => [...prev, backButtons]);
+      scrollToBottom();
+    } catch (err) {
+      console.error("백엔드 호출 실패:", err);
+      setChatLog(prev => [...prev, { role: "assistant", content: "서버 오류가 발생했어요 😥" }]);
+      scrollToBottom();
     }
-
-    const prompt = `질문: ${input}`;
-    const res = await fetch("http://localhost:80/chatBot/api", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: [
-          {
-            role: "system",
-            content: "당신은 안심누리의 한국어 전용 챗봇입니다. 반드시 한국어로, 말풍선 UI에 어울리는 문장으로 깔끔하게 답변해주세요. 중국어나 영어는 절대 사용하지 마세요."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
-    });
-
-    const data = await res.json();
-    const raw = data.choices?.[0]?.message?.content || "답변이 없습니다.";
-    const clean = raw.replace(/\n{2,}/g, "\n").trim();
-
-    setChatLog([...updated, { role: "assistant", content: clean }]);
-  };
-
-  const resetChat = () => {
-    setChatLog([]);
-    setQuestion("");
-    setSelectedMainMenu(null);
-    setSelectedSubMenu(null);
-    setPoliceSearchMode(false);
   };
 
   return (
     <div className="chatbot-container">
       <div className="chatbot-header">🧐 NuriBot 😎</div>
-      <div className="chatbot-subtitle">
-        안녕하세요! 저는 안심누리의 누리봇입니다. <br />
-        🔎 어떤 도움이 필요하신가요?
-      </div>
-
-      {policeSearchMode && (
-        <div className="top-reset-button">
-          <button onClick={resetChat} className="menu-button">↩ 처음으로</button>
-        </div>
-      )}
-
-      {!selectedMainMenu && (
-        <div className="menu-list single-column">
-          {menuOptions.map((option, i) => (
-            <button key={i} className="menu-button" onClick={() => {
-              setSelectedMainMenu(option);
-              setSelectedSubMenu(null);
-              if (option === "지구대 / 경찰서 안내") setPoliceSearchMode(true);
-              if (subMenus[option]?.length === 0) {
-                setChatLog(prev => [...prev, {
-                  role: "assistant",
-                  content: `'${option}' 메뉴를 선택하셨습니다. 안내받고 싶은 지역명을 입력해주세요.`
-                }]);
-              }
-            }}>{option}</button>
-          ))}
-        </div>
-      )}
-
-      {selectedMainMenu && !selectedSubMenu && subMenus[selectedMainMenu]?.length > 0 && (
-        <div className="menu-list single-column">
-          {subMenus[selectedMainMenu].map((option, i) => (
-            <button key={i} className="menu-button" onClick={() => {
-              if (selectedMainMenu === "범죄 피해 지원 제도" && subDetailMenus[option]) {
-                setSelectedSubMenu(option);
-              } else {
-                sendQuestion(option);
-              }
-            }}>{option}</button>
-          ))}
-          <button className="menu-button" onClick={resetChat}>↩ 처음으로</button>
-        </div>
-      )}
-
-      {selectedSubMenu && subDetailMenus[selectedSubMenu]?.length > 0 && (
-        <div className="menu-list single-column">
-          {subDetailMenus[selectedSubMenu].map((item, i) => (
-            <button key={i} className="menu-button" onClick={() => sendQuestion(item)}>{item}</button>
-          ))}
-          <button className="menu-button" onClick={resetChat}>↩ 처음으로</button>
-        </div>
-      )}
-
       <div className="chat-window">
-        {chatLog.map((msg, i) => (
-          <div key={i} className={`chat-bubble ${msg.role === "user" ? "user" : "assistant"}`}>
-            {msg.content}
+        {chatLog.map((msg, i) => {
+          if (msg.role === "menu") {
+            return (
+              <div key={i} className="chat-bubble assistant option-wrapper">
+                {msg.options.map((opt, j) => (
+                  <button
+                    key={j}
+                    className="chat-option-button"
+                    onClick={() => msg.isSubDetail
+                      ? handleFinalSelection(msg.parentMenu, opt)
+                      : msg.isSubMenu
+                      ? handleSubMenuSelect(msg.parentMenu, opt)
+                      : handleMenuSelect(opt)}>
+                    <span className="option-text">{opt}</span>
+                  </button>
+                ))}
+              </div>
+            );
+          }
+          return (
+            <div key={i} className={`chat-bubble ${msg.role === "user" ? "user" : "assistant"}`}>
+              {msg.content}
+            </div>
+          );
+        })}
+        {isLoading && (
+          <div className="chat-bubble assistant typing-indicator">
+            <div>타닥타닥... ⌨️💭<br></br>
+                 누리봇이 답변 작성중 👨‍🚀🚀 </div>
+            <div className="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
-        ))}
+        )}
+
         <div ref={chatEndRef} />
       </div>
 
-      <div className="input-area">
-        <input
-          type="text"
-          className="chat-input"
-          placeholder={policeSearchMode ? "예: 강남구, 신림, 삼성동" : "챗봇의 도움이 필요하신가요?"}
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendQuestion(question)}
-        />
-        <button onClick={() => sendQuestion(question)} className="send-btn">전송</button>
-      </div>
+      {policeSearchMode && (
+        <div className="input-area">
+          <input
+            type="text"
+            className="chat-input"
+            placeholder="예: 강남구, 신림, 삼성동"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && (() => {
+              setChatLog(prev => [...prev, { role: "user", content: question }]);
+              setQuestion("");
+              fetchBackendAndRespond("police", question);
+            })()}
+          />
+          <button onClick={() => fetchBackendAndRespond("police", question)} className="send-btn">전송</button>
+        </div>
+      )}
     </div>
   );
 };
