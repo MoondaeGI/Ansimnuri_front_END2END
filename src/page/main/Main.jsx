@@ -101,8 +101,9 @@ useEffect(() => {
           <div className="infoPanel">
             <div className="infoSection">
               <div className="chatbotHeader">
-              </div>
+           
               <ChatBot />
+                 </div>
             </div>
           </div>
         )}
