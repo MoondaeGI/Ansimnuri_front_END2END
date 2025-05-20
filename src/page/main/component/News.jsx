@@ -13,6 +13,12 @@ export const News = () => {
       })
   }, []);
 
+   const stripHTML = (htmlString) => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlString;
+    return tempDiv.textContent || tempDiv.innerText || "";
+  };
+
   return (
     <div className="newsContainer">
       <div className="newsCardList">
@@ -23,8 +29,13 @@ export const News = () => {
             </div>
             <div className="newsContent">
               <h3 className="newsTitle">
-                <a href={article.url} className="newsTitleLink" target="_blank" rel="noopener noreferrer">
-                  {article.description}
+               <a
+                  href={article.url}
+                  className="newsTitleLink"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {stripHTML(article.description)}
                 </a>
               </h3>
               <p className="newsDate">{new Date(article.regDate).toLocaleString()}</p>
@@ -35,4 +46,5 @@ export const News = () => {
     </div>
   );
 };
+
 
