@@ -8,7 +8,6 @@ import axios from 'axios';
 import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
-import { CctvList, StreetLightList, sexOffenderList } from "../../../component";
 
 
 export const Map = () => {
@@ -49,10 +48,10 @@ export const Map = () => {
         const mapRef = useRef(null);
         const [markerPos, setMarkerPos] = useState(null);
         const [streetlights, setStreetlights] = useState([]);
-        const [lights, setLights] = useState([]);
         const [sexOffenders, setSexOffenders] = useState([]);
         const [cctvs, setCctvs] = useState([]);
         const [showLights, setShowLights] = useState(false);
+        const [showOffenders, setShowOffenders] = useState(false);
         const [viewState, setViewState] = useState({
             ...SEOUL_CENTER,
             zoom: 11,
@@ -89,13 +88,6 @@ export const Map = () => {
                 alert('GPS를 지원하지 않는 브라우저입니다.');
             }
         };
-
-        useEffect(() => {
-            axios.get("http://localhost/api/map/streetLight")
-                .then(res => {
-                    setLights(res.data);
-                })
-        }, [])
 
         useEffect(() => {
             axios.get("http://localhost/api/map/sexOffender")
@@ -185,24 +177,6 @@ export const Map = () => {
                 paint: {
                     'circle-radius': 8,
                     'circle-color': '#4287f5',
-                    'circle-stroke-width': 2,
-                    'circle-stroke-color': '#fff'
-                }
-            });
-
-            map.addSource('street-light', {
-                type: 'geojson',
-                data: { type: 'FeatureCollection', features: [] }
-            });
-
-            map.addLayer({
-                id: 'light-layer',
-                type: 'circle',
-                source: 'street-light',
-                layout: { visibility: showLights ? 'visible' : 'none' },
-                paint: {
-                    'circle-radius': 8,
-                    'circle-color': '#FFFFOO',
                     'circle-stroke-width': 2,
                     'circle-stroke-color': '#fff'
                 }
@@ -316,24 +290,12 @@ export const Map = () => {
             const map = mapRef.current?.getMap();
             if (!map || !map.getSource('police-stations')) return;
             map.getSource('police-stations').setData(toGeoJSON(streetlights));
-            map.getSource('street-light').setData(toGeoJSON(lights));
             map.setLayoutProperty(
                 'police-layer',
                 'visibility',
                 showLights ? 'visible' : 'none'
             );
         }, [streetlights, showLights]);
-
-        useEffect(() => {
-            const map = mapRef.current?.getMap();
-            if (!map || !map.getSource('street-light')) return;
-            map.getSource('street-light').setData(toGeoJSON(lights));
-            map.setLayoutProperty(
-                'light-layer',
-                'visibility',
-                showLights ? 'visible' : 'none'
-            );
-        }, [lights, showLights]);
 
         useEffect(() => {
             const map = mapRef.current?.getMap();
