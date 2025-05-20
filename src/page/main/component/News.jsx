@@ -13,7 +13,7 @@ export const News = () => {
       })
   }, []);
 
-   const stripHTML = (htmlString) => {
+  const stripHTML = (htmlString) => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlString;
     return tempDiv.textContent || tempDiv.innerText || "";
@@ -25,11 +25,15 @@ export const News = () => {
         {newsList.map((article, index) => (
           <div className="newsCard" key={index}>
             <div className="newsImgWrapper">
-              <img src={article.img} className="newsImg"/>
+
+              <img
+                src={article.img ? article.img : process.env.PUBLIC_URL + '/icons/logo.png'}
+                className="newsImg"
+              />
             </div>
             <div className="newsContent">
               <h3 className="newsTitle">
-               <a
+                <a
                   href={article.url}
                   className="newsTitleLink"
                   target="_blank"
