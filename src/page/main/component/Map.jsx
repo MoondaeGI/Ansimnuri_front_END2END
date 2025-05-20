@@ -232,19 +232,21 @@ export const Map = () => {
             } catch (error) {
                 console.error('Terrain setup failed:', error);
             }
-
+            
             setTimeout(() => {
-                const layers = map.getStyle().layers;
-                layers.forEach(layer => {
-                    if (layer.type === 'symbol' && layer.layout?.['text-field']) {
-                        map.setLayoutProperty(
-                            layer.id,
-                            'text-field',
-                            ['coalesce', ['get', 'name_ko'], ['get', 'name']]
-                        );
-                    }
+                const style = map.getStyle();
+                if (!style?.layers) return;
+                style.layers.forEach(layer => {
+                  if (layer.type === 'symbol' && layer.layout?.['text-field']) {
+                    map.setLayoutProperty(
+                      layer.id,
+                      'text-field',
+                      ['coalesce', ['get', 'name_ko'], ['get', 'name']]
+                    );
+                  }
                 });
-            }, 1000);
+              }, 1000);
+
             // 지도 이동 제한 설정
             map.setMaxBounds([
                 [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat],
