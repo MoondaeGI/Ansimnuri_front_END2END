@@ -232,19 +232,21 @@ export const Map = () => {
             } catch (error) {
                 console.error('Terrain setup failed:', error);
             }
-
+            
             setTimeout(() => {
-                const layers = map.getStyle().layers;
-                layers.forEach(layer => {
-                    if (layer.type === 'symbol' && layer.layout?.['text-field']) {
-                        map.setLayoutProperty(
-                            layer.id,
-                            'text-field',
-                            ['coalesce', ['get', 'name_ko'], ['get', 'name']]
-                        );
-                    }
+                const style = map.getStyle();
+                if (!style?.layers) return;
+                style.layers.forEach(layer => {
+                  if (layer.type === 'symbol' && layer.layout?.['text-field']) {
+                    map.setLayoutProperty(
+                      layer.id,
+                      'text-field',
+                      ['coalesce', ['get', 'name_ko'], ['get', 'name']]
+                    );
+                  }
                 });
-            }, 1000);
+              }, 1000);
+
             // 지도 이동 제한 설정
             map.setMaxBounds([
                 [SEOUL_BOUNDS.minLng, SEOUL_BOUNDS.minLat],
@@ -274,7 +276,7 @@ export const Map = () => {
 
 
         return (
-            <div style={{ position: 'relative', width: '100%', height: '600px' }}>
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 {mapRef.current?.getMap() && (
                     <SearchBox
                         accessToken={MAPBOX_TOKEN}
@@ -385,11 +387,9 @@ export const Map = () => {
         );
     };
 
-    return (
-        <div>
-            <SeoulMap3D />
-            <div style={{ margin: '20px auto', maxWidth: '800px' }}>
-            </div>
-        </div>
-    );
+ return (
+  <div style={{ height: '100%' }}>
+    <SeoulMap3D />
+  </div>
+);
 };

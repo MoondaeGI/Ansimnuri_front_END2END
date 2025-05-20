@@ -8,20 +8,18 @@ export const ChatBot = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState(null);
   const [policeSearchMode, setPoliceSearchMode] = useState(false);
   const [previousMenu, setPreviousMenu] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
     if (chatEndRef.current) {
-      const last = chatLog[chatLog.length - 1];
-      const isContentMessage = last?.role === 'user' || last?.role === 'assistant';
-      if (isContentMessage) {
-        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatLog]);
 
   const menuOptions = [
     "🚔 지구대 / 경찰서 안내",
+    "📰 최근 범죄 뉴스 TOP 3",
     "🏡 안전한 귀가 경로 추천",
     "🚨 범죄 피해 대처 요령",
     "💙 범죄 피해 지원 제도",
@@ -30,17 +28,19 @@ export const ChatBot = () => {
 
   const subMenus = {
     "🚔 지구대 / 경찰서 안내": [],
+    "📰 최근 범죄 뉴스 TOP 3":[],
+    "🏡 안전한 귀가 경로 추천":[],
     "🚨 범죄 피해 대처 요령": [
-      "강력범죄 피해시 대처요령",
-      "성폭력 피해시 대처요령",
-      "가정폭력 피해시 대처요령",
-      "학교폭력 피해시 대처요령"
+      "🔹 강력범죄 피해시 대처요령",
+      "🔹 성폭력 피해시 대처요령",
+      "🔹 가정폭력 피해시 대처요령",
+      "🔹 학교폭력 피해시 대처요령"
     ],
     "💙 범죄 피해 지원 제도": [
-      "경제적 지원제도",
-      "법률적 지원제도",
-      "심리치료 지원제도",
-      "주거 지원제도"
+      "◼️ 경제적 지원제도",
+      "◼️ 법률적 지원제도",
+      "◼️ 심리치료 지원제도",
+      "◼️ 주거 지원제도"
     ],
     "💡 자주 묻는 질문 (FAQ)": [
       "무슨 사이트인가요?",
@@ -52,30 +52,30 @@ export const ChatBot = () => {
   };
 
   const subDetailMenus = {
-    "경제적 지원제도": [
-      "범죄피해자구조금제도",
-      "긴급복지 지원제도",
-      "무보험차량·뺑소니 피해자 구조제도",
-      "이전비 지원제도",
-      "주거지원제도",
-      "자동차사고 피해가족 지원제도",
-      "배상명령제도",
-      "보험급여 지원제도"
+    "◼️ 경제적 지원제도": [
+      "◼️ 범죄피해자구조금제도",
+      "◼️ 긴급복지 지원제도",
+      "◼️ 무보험차량·뺑소니 피해자 구조제도",
+      "◼️ 이전비 지원제도",
+      "◼️ 주거지원제도",
+      "◼️ 자동차사고 피해가족 지원제도",
+      "◼️ 배상명령제도",
+      "◼️ 보험급여 지원제도"
     ],
-    "법률적 지원제도": [
-      "무료법률구조제도",
-      "형사조정제도",
-      "법률홈닥터",
-      "화해제도"
+    "◼️ 법률적 지원제도": [
+      "◼️ 무료법률구조제도",
+      "◼️ 형사조정제도",
+      "◼️ 법률홈닥터",
+      "◼️ 화해제도"
     ],
-    "심리치료 지원제도": [
-      "스마일센터를 통한 심리치료 지원",
-      "CARE(피해자심리전문요원)"
+    "◼️ 심리치료 지원제도": [
+      "◼️ 스마일센터를 통한 심리치료 지원",
+      "◼️ CARE(피해자심리전문요원)"
     ],
-    "주거 지원제도": [
-      "피해자 임시숙소 제도",
-      "성폭력피해자 보호시설",
-      "가정폭력피해자 보호시설"
+    "◼️ 주거 지원제도": [
+      "◼️ 피해자 임시숙소 제도",
+      "◼️ 성폭력피해자 보호시설",
+      "◼️ 가정폭력피해자 보호시설"
     ]
   };
 
@@ -89,10 +89,18 @@ export const ChatBot = () => {
     }]);
   }, []);
 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 50);
+  };
+
   const resetChat = () => {
     setChatLog([{
       role: "assistant",
-      content: "안녕하세요! 저는 안심누리의 누리봇입니다. 어떤 도움이 필요하신가요?",
+      content: "안녕하세요! 누리봇이예요 🤗  어떤 도움이 필요하신가요? ❤️ ",
     }, {
       role: "menu",
       options: menuOptions
@@ -102,14 +110,26 @@ export const ChatBot = () => {
     setSelectedSubMenu(null);
     setPreviousMenu(null);
     setPoliceSearchMode(false);
+    scrollToBottom();
   };
 
   const handleMenuSelect = async (option) => {
-    if (option === "처음으로") {
+    if (option === "🏠 처음으로") {
       resetChat();
       return;
     }
-    if (option === "이전으로") {
+    
+    try {
+      await fetch("http://localhost:80/api/dashboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ menuName: option })
+      });
+    } catch (err) {
+      console.error("클릭 로그 전송 실패:", err);
+    }
+
+    if (option === "🚩 이전으로") {
       if (previousMenu) {
         setChatLog(prev => [...prev, {
           role: "menu",
@@ -121,6 +141,7 @@ export const ChatBot = () => {
         setSelectedMainMenu(previousMenu.parentMenu || null);
         setSelectedSubMenu(null);
         setPoliceSearchMode(previousMenu.parentMenu === "🚔 지구대 / 경찰서 안내");
+        scrollToBottom();
       } else {
         setSelectedMainMenu(null);
         setSelectedSubMenu(null);
@@ -129,12 +150,50 @@ export const ChatBot = () => {
           role: "menu",
           options: menuOptions
         }]);
+        scrollToBottom();
       }
       return;
     }
     setSelectedMainMenu(option);
     setChatLog(prev => [...prev, { role: "user", content: option }]);
 
+    if (option === "📰 최근 범죄 뉴스 TOP 3") {
+      try {
+        setIsLoading(true);
+
+        const res = await fetch("http://localhost:80/chatBot/news/top3");
+        const newsList = await res.json();
+        const summaryRes = await fetch("http://localhost:80/chatBot/news/summarize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newsList)
+        });
+    
+        const summaryList = await summaryRes.json();
+        const summaryHTML = summaryList.map(
+          (n, i) => `<p><strong>📅 제목:</strong> ${n.title}
+<strong>📌 주요 내용 요약:</strong> ${n.summary}
+<strong>🔗 기사 링크:</strong> <a href="${n.url}" target="_blank" rel="noopener noreferrer">${n.url}</a></p>`).join("");
+        
+        setChatLog(prev => [...prev, {
+          role: "assistant",
+          content: <div dangerouslySetInnerHTML={{ __html: summaryHTML }} />
+        },
+        {
+          role: "menu",
+          options: ["🏠 처음으로"]
+        }]);
+        scrollToBottom();
+      } catch (err) {
+        console.error("뉴스 요약 실패:", err);
+        setChatLog(prev => [...prev, { role: "assistant", content: "뉴스를 가져오지 못했어요 😥" }]);
+        scrollToBottom();
+      }finally {
+        setIsLoading(false);
+      }
+      return;
+    }    
+    
     if (option === "🚔 지구대 / 경찰서 안내") {
       setPoliceSearchMode(true);
       setChatLog(prev => [...prev, { role: "assistant", content: `'${option}' 메뉴를 선택하셨습니다.
@@ -152,6 +211,7 @@ export const ChatBot = () => {
       };
       setPreviousMenu({ ...menuData });
       setChatLog(prev => [...prev, menuData]);
+      scrollToBottom();
     } else {
       handleFinalSelection(option, option);
     }
@@ -170,6 +230,7 @@ export const ChatBot = () => {
       };
       setPreviousMenu({ ...menuData });
       setChatLog(prev => [...prev, menuData]);
+      scrollToBottom();
     } else {
       handleFinalSelection(parentMenu, option);
     }
@@ -219,6 +280,7 @@ export const ChatBot = () => {
         const gptContent = gptData.choices?.[0]?.message?.content || "해당 정보는 아직 준비되지 않았어요. 조금만 기다려 주세요!";
 
         setChatLog(prev => [...prev, { role: "assistant", content: gptContent }]);
+        scrollToBottom();
         return;
       }
 
@@ -228,17 +290,19 @@ export const ChatBot = () => {
           <div>
             <div>{typeof result === 'string' ? result : result.map((p, i) => `${i + 1}. ${p.name} (${p.address})`).join("\n")}</div>
             <div style={{ marginTop: '8px' }}>
-              <button className="chat-option-button" onClick={() => handleMenuSelect("이전으로")}>🚩 이전으로</button>
-              <button className="chat-option-button" onClick={() => handleMenuSelect("처음으로")}>🏠 처음으로</button>
+              <button className="chat-option-button" onClick={() => handleMenuSelect("🚩 이전으로")}>🚩 이전으로</button>
+              <button className="chat-option-button" onClick={() => handleMenuSelect("🏠 처음으로")}>🏠 처음으로</button>
             </div>
           </div>
         )
       };
 
       setChatLog(prev => [...prev, backButtons]);
+      scrollToBottom();
     } catch (err) {
       console.error("백엔드 호출 실패:", err);
       setChatLog(prev => [...prev, { role: "assistant", content: "서버 오류가 발생했어요 😥" }]);
+      scrollToBottom();
     }
   };
 
@@ -271,6 +335,18 @@ export const ChatBot = () => {
             </div>
           );
         })}
+        {isLoading && (
+          <div className="chat-bubble assistant typing-indicator">
+            <div>타닥타닥... ⌨️💭<br></br>
+                 누리봇이 답변 작성중 👨‍🚀🚀 </div>
+            <div className="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        )}
+
         <div ref={chatEndRef} />
       </div>
 
