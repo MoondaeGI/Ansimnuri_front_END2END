@@ -274,7 +274,7 @@ export const Map = () => {
 
 
         return (
-            <div style={{ position: 'relative', width: '100%', height: '600px' }}>
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 {mapRef.current?.getMap() && (
                     <SearchBox
                         accessToken={MAPBOX_TOKEN}
@@ -385,11 +385,9 @@ export const Map = () => {
         );
     };
 
-    return (
-        <div>
-            <SeoulMap3D />
-            <div style={{ margin: '20px auto', maxWidth: '800px' }}>
-            </div>
-        </div>
-    );
+ return (
+  <div style={{ height: '100%' }}>
+    <SeoulMap3D />
+  </div>
+);
 };
