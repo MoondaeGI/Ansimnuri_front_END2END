@@ -91,7 +91,13 @@ function SimpleRegisterPage() {
         }
 
         try {
-            await axios.post('http://localhost/api/member/kakaoSignup', form);
+            await axios.post('http://localhost/api/member/kakaoSignup',{
+                 kakaoId: form.kakaoId,
+    nickname: form.nickname,
+    email: form.email,
+    address: form.address,
+    detailAddress: form.detailAddress,
+    postcode: form.postcode});
             alert('회원가입 성공! 다시 로그인 해주세요.');
             navigate('/login');
         } catch (err) {

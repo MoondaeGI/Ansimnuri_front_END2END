@@ -344,7 +344,7 @@ const handleSubmit = async (e) => {
               /> 개인정보 수집방침 동의
               <button type="button" className="btn" onClick={() => openAgreementModal('privacy')}>보기</button>
             </label><br />
-            <button type="submit" className="btn" >가입하기</button>
+            {/* <button type="submit" className="btn" >가입하기</button> */}
           </div>
 
 
