@@ -118,6 +118,17 @@ export const ChatBot = () => {
       resetChat();
       return;
     }
+    
+    try {
+      await fetch("http://localhost:80/api/dashboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ menuName: option })
+      });
+    } catch (err) {
+      console.error("클릭 로그 전송 실패:", err);
+    }
+
     if (option === "🚩 이전으로") {
       if (previousMenu) {
         setChatLog(prev => [...prev, {
@@ -327,7 +338,7 @@ export const ChatBot = () => {
         {isLoading && (
           <div className="chat-bubble assistant typing-indicator">
             <div>타닥타닥... ⌨️💭<br></br>
-                 누리봇 답변 작성중 👨‍🚀🚀 </div>
+                 누리봇이 답변 작성중 👨‍🚀🚀 </div>
             <div className="typing-dots">
               <span></span>
               <span></span>
