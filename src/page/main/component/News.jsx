@@ -27,7 +27,7 @@ export const News = () => {
             <div className="newsImgWrapper">
 
               <img
-                src={article.img ? article.img : process.env.PUBLIC_URL + '/icons/logo.png'}
+                src={article.img ? article.img : process.env.PUBLIC_URL + '/icons/noimage.jpg'}
                 className="newsImg"
               />
             </div>
