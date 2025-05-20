@@ -6,14 +6,16 @@ import { Routes, Route } from 'react-router-dom'
 import { Container, Row, Col, Navbar, Nav } from 'react-bootstrap'
 import SimpleRegisterPage from './page/member/SimpleRegisterPage';
 import { useEffect, useState } from 'react'
-import { useAuthStore, useNoteStore } from './store'
+import { useAuthStore,useNoteStore  } from './store'
 import { Steps } from 'intro.js-react';
 import KakaoRedirect from './page/member/KakaoRedirect';
+
 
 import 'intro.js/introjs.css';
 
 function App() {
   const [expanded, setExpanded] = useState(false)
+
   const [showGuide, setShowGuide] = useState(false);
   const { token, initialize, logout } = useAuthStore();
   const { connect } = useNoteStore();
@@ -22,6 +24,8 @@ function App() {
     initialize();
     connect();
   }, [])
+
+
 
   const handleLogout = () => {
     logout();

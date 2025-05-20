@@ -1,5 +1,4 @@
 import './css/Map.css';
-import { NoteList } from "../../../component";
 import { useNoteStore } from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -8,6 +7,8 @@ import axios from 'axios';
 import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
+import {useDirections} from "../../../util";
+import {Button, Card} from "react-bootstrap";
 
 
 export const Map = () => {
@@ -48,13 +49,18 @@ export const Map = () => {
         const mapRef = useRef(null);
         const [markerPos, setMarkerPos] = useState(null);
         const [streetlights, setStreetlights] = useState([]);
+        const [sexOffenders, setSexOffenders] = useState([]);
+        const [cctvs, setCctvs] = useState([]);
         const [showLights, setShowLights] = useState(false);
+        const [showOffenders, setShowOffenders] = useState(false);
         const [viewState, setViewState] = useState({
             ...SEOUL_CENTER,
             zoom: 11,
             pitch: 0,
             bearing: 0
         });
+
+        const { routeGeoJSON, loading, error } = useDirections(searchMarker, userLocation);
 
         const toGeoJSON = items => ({
             type: 'FeatureCollection',
@@ -87,6 +93,20 @@ export const Map = () => {
         };
 
         useEffect(() => {
+            axios.get("http://localhost/api/map/sexOffender")
+                .then(res => {
+                    setSexOffenders(res.data);
+                })
+        }, [])
+
+        useEffect(() => {
+            axios.get("http://localhost/api/map/cctv")
+                .then(res => {
+                    setCctvs(res.data);
+                })
+        }, []);
+
+        useEffect(() => {
             axios.get("http://localhost/api/map/police").then((resp => {
                 console.log(resp.data);
                 setStreetlights(resp.data);
@@ -112,14 +132,29 @@ export const Map = () => {
             const pitch = calculatePitch(evt.viewState.zoom);
             setViewState(constrainView({ ...evt.viewState, pitch }));
         }, [calculatePitch]);
-
+/*
         // 검색박스 선택
         const handleSearchSelect = useCallback(({ result }) => {
+            console.log(result);
             if (!result?.geometry) return;
             const [lon, lat] = result.geometry.coordinates;
             setViewState({ longitude: lon, latitude: lat, zoom: 14, pitch: 45, bearing: 0 });
-        }, []);
 
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (coords) => {
+                        const { latitude, longitude } = coords;
+                        setUserLocation({ latitude, longitude });
+                        console.log(coords);
+                    },
+                    (error) => {
+                        console.error('GPS 위치를 가져올 수 없습니다:', error);
+                    }
+                );
+            }
+
+        }, []);
+ */
         const onMapLoad = useCallback((e) => {
             const map = mapRef.current?.getMap();
             if (!map || map.getLayer('3d-buildings')) return;
@@ -147,27 +182,6 @@ export const Map = () => {
                 });
             });
 
-            // 눈 효과 적용 (한 번만 호출)
-            // map.on('style.load', () => {
-            //   map.setRain({
-            //     density: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.7],
-            //     intensity: 1.0,
-            //     color: '#ffffff',
-            //     'flake-size': 1.2,
-            //     opacity: 0.9,
-            //     vignette: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.4]
-            //   });
-            // });
-            // // 초기 스타일에도 바로 눈 내리기
-            // map.setRain({
-            //   density: 0.7,
-            //   intensity: 1.0,
-            //   color: '#ffffff',
-            //   'flake-size': 1.2,
-            //   opacity: 0.9,
-            //   vignette: 0.4
-            // });
-
             map.addSource('police-stations', {
                 type: 'geojson',
                 data: { type: 'FeatureCollection', features: [] }
@@ -186,10 +200,43 @@ export const Map = () => {
                 }
             });
 
+            map.addSource('sex-offender', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            map.addLayer({
+                id: 'offender-layer',
+                type: 'circle',
+                source: 'sex-offender',
+                layout: { visibility: showLights ? 'visible' : 'none' },
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#645394',
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            map.addSource('cctv', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            map.addLayer({
+                id: 'cctv-layer',
+                type: 'circle',
+                source: 'cctv',
+                layout: { visibility: showLights ? 'visible' : 'none' },
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#c4c4c4',
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
             map.on('style.load', () => {
-                //map.setConfigProperty('basemap', 'lightPreset', 'dawn');  // 일출
-                // map.setConfigProperty('basemap', 'lightPreset', 'day');   // 낮
-                // map.setConfigProperty('basemap', 'lightPreset', 'dusk');  // 일몰
                 map.setConfigProperty('basemap', 'lightPreset', 'night'); // 밤
             });
 
@@ -265,6 +312,28 @@ export const Map = () => {
             );
         }, [streetlights, showLights]);
 
+        useEffect(() => {
+            const map = mapRef.current?.getMap();
+            if (!map || !map.getSource('sex-offender')) return;
+            map.getSource('sex-offender').setData(toGeoJSON(sexOffenders));
+            map.setLayoutProperty(
+                'offender-layer',
+                'visibility',
+                showLights ? 'visible' : 'none'
+            );
+        }, [sexOffenders, showLights]);
+
+        useEffect(() => {
+            const map = mapRef.current?.getMap();
+            if (!map || !map.getSource('cctv')) return;
+            map.getSource('cctv').setData(toGeoJSON(cctvs));
+            map.setLayoutProperty(
+                'cctv-layer',
+                'visibility',
+                showLights ? 'visible' : 'none'
+            );
+        }, [sexOffenders, showLights]);
+
         const toggleView = useCallback(() => {
             setViewState(prev => constrainView({
                 ...prev,
@@ -298,6 +367,29 @@ export const Map = () => {
                             fuzzyMatch: true
                         }}
                         placeholder='주소 또는 지역명 검색'
+                        onRetrieve={(result) => {
+                            console.log(result);
+                            const [lon, lat] = result.geometry.coordinates;
+
+                            // 검색 위치 설정
+                            setSearchMarker({
+                                longitude: lon,
+                                latitude: lat,
+                            });
+
+
+                            if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(
+                                    (coords) => {
+                                        const { latitude, longitude } = coords;
+                                        setUserLocation({ latitude, longitude });
+                                    },
+                                    (error) => {
+                                        console.error('GPS 위치를 가져올 수 없습니다:', error);
+                                    }
+                                );
+                            }
+                        }}
                     />
                 )}
                 <MapGL
@@ -326,6 +418,7 @@ export const Map = () => {
                         </Marker>
                     )}
                     {searchMarker && (
+                        <>
                         <Marker
                             longitude={searchMarker.longitude}
                             latitude={searchMarker.latitude}
@@ -333,6 +426,40 @@ export const Map = () => {
                         >
                             <div className="search-marker" />
                         </Marker>
+                            <Popup
+                                longitude={searchMarker.longitude}
+                                latitude={searchMarker.latitude}
+                                closeButton={true}
+                                closeOnClick={false}
+                                anchor="bottom"
+                            >
+                                <Card style={{ border: 'none' }}>
+                                    <Card.Body className="p-2">
+                                        <Card.Title className="h6 mb-2">{searchMarker.name || '선택한 위치'}</Card.Title>
+                                        <div className="d-flex gap-2">
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    console.log("click")
+                                                }
+                                                }>길찾기
+                                            </Button>
+                                            <Button
+                                                variant="outline-secondary"
+                                                size="sm"
+                                                onClick={() => {
+                                                    // 팝업 닫기 등 추가 기능
+                                                }}
+                                            >
+                                                닫기
+                                            </Button>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Popup>
+                        </>
                     )}
                     {userLocation && (
                         <Marker
@@ -343,7 +470,6 @@ export const Map = () => {
                             <div className="user-marker" />
                         </Marker>
                     )}
-                    <NoteList />
                 </MapGL>
                 <button
                     onClick={toggleView}

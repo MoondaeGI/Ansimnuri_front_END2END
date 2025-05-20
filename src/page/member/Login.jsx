@@ -80,7 +80,11 @@ export const Login = () => {
       navigate('/');
     } catch (err) {
       console.error("로그인 실패:", err.response?.data || err.message);
-      alert('아이디와 비밀번호를 확인해주세요');
+      if (err.response.status === 403) {
+        window.alert(err.response.data);
+      } else {
+        alert('아이디와 비밀번호를 확인해주세요');
+      }
     }
   };
 
