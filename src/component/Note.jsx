@@ -116,24 +116,6 @@ export const Note = ({id: _id}) => {
             <div className="card post-it-note">
                 <div className="card-body">
                     {isUpdate ? updateNote() : noteContent()}
-
-                    <hr className="note-divider" />
-
-                    <div className="reply-section">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h6 className="card-title mb-0">댓글 {replyCount}개</h6>
-                            <Button className="btn btn-outline-secondary btn-sm" onClick={openReply}>
-                                열기
-                            </Button>
-                        </div>
-                        <div className="reply-list mb-3">{replyList}</div>
-                        <div className="mb-3">
-                            <textarea className="form-control note-textarea" rows="2" placeholder="댓글을 입력하세요..."></textarea>
-                        </div>
-                        <div className="d-flex justify-content-end">
-                            <Button className="btn btn-primary btn-sm me-2">등록</Button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

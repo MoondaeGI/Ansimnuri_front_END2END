@@ -1,5 +1,5 @@
 import './css/Map.css';
-import { NoteList } from "../../../component";
+import {NoteList, SexOffenderList} from "../../../component";
 import { useNoteStore } from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -8,6 +8,7 @@ import axios from 'axios';
 import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
+import { CctvList, StreetLightList, sexOffenderList } from "../../../component";
 
 
 export const Map = () => {
@@ -48,6 +49,9 @@ export const Map = () => {
         const mapRef = useRef(null);
         const [markerPos, setMarkerPos] = useState(null);
         const [streetlights, setStreetlights] = useState([]);
+        const [lights, setLights] = useState([]);
+        const [sexOffenders, setSexOffenders] = useState([]);
+        const [cctvs, setCctvs] = useState([]);
         const [showLights, setShowLights] = useState(false);
         const [viewState, setViewState] = useState({
             ...SEOUL_CENTER,
@@ -85,6 +89,27 @@ export const Map = () => {
                 alert('GPS를 지원하지 않는 브라우저입니다.');
             }
         };
+
+        useEffect(() => {
+            axios.get("http://localhost/api/map/streetLight")
+                .then(res => {
+                    setLights(res.data);
+                })
+        }, [])
+
+        useEffect(() => {
+            axios.get("http://localhost/api/map/sexOffender")
+                .then(res => {
+                    setSexOffenders(res.data);
+                })
+        }, [])
+
+        useEffect(() => {
+            axios.get("http://localhost/api/map/cctv")
+                .then(res => {
+                    setCctvs(res.data);
+                })
+        }, []);
 
         useEffect(() => {
             axios.get("http://localhost/api/map/police").then((resp => {
@@ -147,27 +172,6 @@ export const Map = () => {
                 });
             });
 
-            // 눈 효과 적용 (한 번만 호출)
-            // map.on('style.load', () => {
-            //   map.setRain({
-            //     density: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.7],
-            //     intensity: 1.0,
-            //     color: '#ffffff',
-            //     'flake-size': 1.2,
-            //     opacity: 0.9,
-            //     vignette: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.4]
-            //   });
-            // });
-            // // 초기 스타일에도 바로 눈 내리기
-            // map.setRain({
-            //   density: 0.7,
-            //   intensity: 1.0,
-            //   color: '#ffffff',
-            //   'flake-size': 1.2,
-            //   opacity: 0.9,
-            //   vignette: 0.4
-            // });
-
             map.addSource('police-stations', {
                 type: 'geojson',
                 data: { type: 'FeatureCollection', features: [] }
@@ -182,6 +186,60 @@ export const Map = () => {
                     'circle-radius': 8,
                     'circle-color': '#4287f5',
                     'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            map.addSource('street-light', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            map.addLayer({
+                id: 'light-layer',
+                type: 'circle',
+                source: 'street-light',
+                layout: { visibility: showLights ? 'visible' : 'none' },
+                paint: {
+                    'circle-radius': 8,
+                    'circle-color': '#FFFFOO',
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            map.addSource('sex-offender', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            map.addLayer({
+                id: 'offender-layer',
+                type: 'circle',
+                source: 'sex-offender',
+                layout: { visibility: showLights ? 'visible' : 'none' },
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#645394',
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            map.addSource('cctv', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            map.addLayer({
+                id: 'cctv-layer',
+                type: 'circle',
+                source: 'cctv',
+                layout: { visibility: showLights ? 'visible' : 'none' },
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#c4c4c4',
+                    'circle-stroke-width': 1,
                     'circle-stroke-color': '#fff'
                 }
             });
@@ -258,12 +316,46 @@ export const Map = () => {
             const map = mapRef.current?.getMap();
             if (!map || !map.getSource('police-stations')) return;
             map.getSource('police-stations').setData(toGeoJSON(streetlights));
+            map.getSource('street-light').setData(toGeoJSON(lights));
             map.setLayoutProperty(
                 'police-layer',
                 'visibility',
                 showLights ? 'visible' : 'none'
             );
         }, [streetlights, showLights]);
+
+        useEffect(() => {
+            const map = mapRef.current?.getMap();
+            if (!map || !map.getSource('street-light')) return;
+            map.getSource('street-light').setData(toGeoJSON(lights));
+            map.setLayoutProperty(
+                'light-layer',
+                'visibility',
+                showLights ? 'visible' : 'none'
+            );
+        }, [lights, showLights]);
+
+        useEffect(() => {
+            const map = mapRef.current?.getMap();
+            if (!map || !map.getSource('sex-offender')) return;
+            map.getSource('sex-offender').setData(toGeoJSON(sexOffenders));
+            map.setLayoutProperty(
+                'offender-layer',
+                'visibility',
+                showLights ? 'visible' : 'none'
+            );
+        }, [sexOffenders, showLights]);
+
+        useEffect(() => {
+            const map = mapRef.current?.getMap();
+            if (!map || !map.getSource('cctv')) return;
+            map.getSource('cctv').setData(toGeoJSON(cctvs));
+            map.setLayoutProperty(
+                'cctv-layer',
+                'visibility',
+                showLights ? 'visible' : 'none'
+            );
+        }, [sexOffenders, showLights]);
 
         const toggleView = useCallback(() => {
             setViewState(prev => constrainView({
@@ -343,7 +435,6 @@ export const Map = () => {
                             <div className="user-marker" />
                         </Marker>
                     )}
-                    <NoteList />
                 </MapGL>
                 <button
                     onClick={toggleView}
