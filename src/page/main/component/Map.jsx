@@ -7,6 +7,8 @@ import axios from 'axios';
 import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
+import {useDirections} from "../../../util";
+import {Button, Card} from "react-bootstrap";
 
 
 export const Map = () => {
@@ -57,6 +59,8 @@ export const Map = () => {
             pitch: 0,
             bearing: 0
         });
+
+        const { routeGeoJSON, loading, error } = useDirections(searchMarker, userLocation);
 
         const toGeoJSON = items => ({
             type: 'FeatureCollection',
@@ -128,14 +132,29 @@ export const Map = () => {
             const pitch = calculatePitch(evt.viewState.zoom);
             setViewState(constrainView({ ...evt.viewState, pitch }));
         }, [calculatePitch]);
-
+/*
         // 검색박스 선택
         const handleSearchSelect = useCallback(({ result }) => {
+            console.log(result);
             if (!result?.geometry) return;
             const [lon, lat] = result.geometry.coordinates;
             setViewState({ longitude: lon, latitude: lat, zoom: 14, pitch: 45, bearing: 0 });
-        }, []);
 
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (coords) => {
+                        const { latitude, longitude } = coords;
+                        setUserLocation({ latitude, longitude });
+                        console.log(coords);
+                    },
+                    (error) => {
+                        console.error('GPS 위치를 가져올 수 없습니다:', error);
+                    }
+                );
+            }
+
+        }, []);
+ */
         const onMapLoad = useCallback((e) => {
             const map = mapRef.current?.getMap();
             if (!map || map.getLayer('3d-buildings')) return;
@@ -218,9 +237,6 @@ export const Map = () => {
             });
 
             map.on('style.load', () => {
-                //map.setConfigProperty('basemap', 'lightPreset', 'dawn');  // 일출
-                // map.setConfigProperty('basemap', 'lightPreset', 'day');   // 낮
-                // map.setConfigProperty('basemap', 'lightPreset', 'dusk');  // 일몰
                 map.setConfigProperty('basemap', 'lightPreset', 'night'); // 밤
             });
 
@@ -351,6 +367,29 @@ export const Map = () => {
                             fuzzyMatch: true
                         }}
                         placeholder='주소 또는 지역명 검색'
+                        onRetrieve={(result) => {
+                            console.log(result);
+                            const [lon, lat] = result.geometry.coordinates;
+
+                            // 검색 위치 설정
+                            setSearchMarker({
+                                longitude: lon,
+                                latitude: lat,
+                            });
+
+
+                            if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(
+                                    (coords) => {
+                                        const { latitude, longitude } = coords;
+                                        setUserLocation({ latitude, longitude });
+                                    },
+                                    (error) => {
+                                        console.error('GPS 위치를 가져올 수 없습니다:', error);
+                                    }
+                                );
+                            }
+                        }}
                     />
                 )}
                 <MapGL
@@ -379,6 +418,7 @@ export const Map = () => {
                         </Marker>
                     )}
                     {searchMarker && (
+                        <>
                         <Marker
                             longitude={searchMarker.longitude}
                             latitude={searchMarker.latitude}
@@ -386,6 +426,40 @@ export const Map = () => {
                         >
                             <div className="search-marker" />
                         </Marker>
+                            <Popup
+                                longitude={searchMarker.longitude}
+                                latitude={searchMarker.latitude}
+                                closeButton={true}
+                                closeOnClick={false}
+                                anchor="bottom"
+                            >
+                                <Card style={{ border: 'none' }}>
+                                    <Card.Body className="p-2">
+                                        <Card.Title className="h6 mb-2">{searchMarker.name || '선택한 위치'}</Card.Title>
+                                        <div className="d-flex gap-2">
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    console.log("click")
+                                                }
+                                                }>길찾기
+                                            </Button>
+                                            <Button
+                                                variant="outline-secondary"
+                                                size="sm"
+                                                onClick={() => {
+                                                    // 팝업 닫기 등 추가 기능
+                                                }}
+                                            >
+                                                닫기
+                                            </Button>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Popup>
+                        </>
                     )}
                     {userLocation && (
                         <Marker
