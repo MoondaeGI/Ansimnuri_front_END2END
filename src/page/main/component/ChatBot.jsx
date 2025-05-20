@@ -8,6 +8,7 @@ export const ChatBot = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState(null);
   const [policeSearchMode, setPoliceSearchMode] = useState(false);
   const [previousMenu, setPreviousMenu] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -113,11 +114,11 @@ export const ChatBot = () => {
   };
 
   const handleMenuSelect = async (option) => {
-    if (option === "처음으로") {
+    if (option === "🏠 처음으로") {
       resetChat();
       return;
     }
-    if (option === "이전으로") {
+    if (option === "🚩 이전으로") {
       if (previousMenu) {
         setChatLog(prev => [...prev, {
           role: "menu",
@@ -147,6 +148,8 @@ export const ChatBot = () => {
 
     if (option === "📰 최근 범죄 뉴스 TOP 3") {
       try {
+        setIsLoading(true);
+
         const res = await fetch("http://localhost:80/chatBot/news/top3");
         const newsList = await res.json();
         const summaryRes = await fetch("http://localhost:80/chatBot/news/summarize", {
@@ -164,17 +167,22 @@ export const ChatBot = () => {
         setChatLog(prev => [...prev, {
           role: "assistant",
           content: <div dangerouslySetInnerHTML={{ __html: summaryHTML }} />
+        },
+        {
+          role: "menu",
+          options: ["🏠 처음으로"]
         }]);
         scrollToBottom();
       } catch (err) {
         console.error("뉴스 요약 실패:", err);
         setChatLog(prev => [...prev, { role: "assistant", content: "뉴스를 가져오지 못했어요 😥" }]);
         scrollToBottom();
+      }finally {
+        setIsLoading(false);
       }
       return;
     }    
     
-
     if (option === "🚔 지구대 / 경찰서 안내") {
       setPoliceSearchMode(true);
       setChatLog(prev => [...prev, { role: "assistant", content: `'${option}' 메뉴를 선택하셨습니다.
@@ -271,8 +279,8 @@ export const ChatBot = () => {
           <div>
             <div>{typeof result === 'string' ? result : result.map((p, i) => `${i + 1}. ${p.name} (${p.address})`).join("\n")}</div>
             <div style={{ marginTop: '8px' }}>
-              <button className="chat-option-button" onClick={() => handleMenuSelect("이전으로")}>🚩 이전으로</button>
-              <button className="chat-option-button" onClick={() => handleMenuSelect("처음으로")}>🏠 처음으로</button>
+              <button className="chat-option-button" onClick={() => handleMenuSelect("🚩 이전으로")}>🚩 이전으로</button>
+              <button className="chat-option-button" onClick={() => handleMenuSelect("🏠 처음으로")}>🏠 처음으로</button>
             </div>
           </div>
         )
@@ -316,6 +324,18 @@ export const ChatBot = () => {
             </div>
           );
         })}
+        {isLoading && (
+          <div className="chat-bubble assistant typing-indicator">
+            <div>타닥타닥... ⌨️💭<br></br>
+                 누리봇 답변 작성중 👨‍🚀🚀 </div>
+            <div className="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        )}
+
         <div ref={chatEndRef} />
       </div>
 
