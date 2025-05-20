@@ -18,7 +18,7 @@ export const ChatBot = () => {
 
   const menuOptions = [
     "🚔 지구대 / 경찰서 안내",
-    "🎤 최근 범죄 뉴스 TOP 3",
+    "📰 최근 범죄 뉴스 TOP 3",
     "🏡 안전한 귀가 경로 추천",
     "🚨 범죄 피해 대처 요령",
     "💙 범죄 피해 지원 제도",
@@ -27,7 +27,7 @@ export const ChatBot = () => {
 
   const subMenus = {
     "🚔 지구대 / 경찰서 안내": [],
-    "🎤 최근 범죄 뉴스 TOP 3":[],
+    "📰 최근 범죄 뉴스 TOP 3":[],
     "🏡 안전한 귀가 경로 추천":[],
     "🚨 범죄 피해 대처 요령": [
       "강력범죄 피해시 대처요령",
@@ -144,6 +144,36 @@ export const ChatBot = () => {
     }
     setSelectedMainMenu(option);
     setChatLog(prev => [...prev, { role: "user", content: option }]);
+
+    if (option === "📰 최근 범죄 뉴스 TOP 3") {
+      try {
+        const res = await fetch("http://localhost:80/chatBot/news/top3");
+        const newsList = await res.json();
+        const summaryRes = await fetch("http://localhost:80/chatBot/news/summarize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newsList)
+        });
+    
+        const summaryList = await summaryRes.json();
+        const summaryHTML = summaryList.map(
+          (n, i) => `<p><strong>📅 제목:</strong> ${n.title}
+<strong>📌 주요 내용 요약:</strong> ${n.summary}
+<strong>🔗 기사 링크:</strong> <a href="${n.url}" target="_blank" rel="noopener noreferrer">${n.url}</a></p>`).join("");
+        
+        setChatLog(prev => [...prev, {
+          role: "assistant",
+          content: <div dangerouslySetInnerHTML={{ __html: summaryHTML }} />
+        }]);
+        scrollToBottom();
+      } catch (err) {
+        console.error("뉴스 요약 실패:", err);
+        setChatLog(prev => [...prev, { role: "assistant", content: "뉴스를 가져오지 못했어요 😥" }]);
+        scrollToBottom();
+      }
+      return;
+    }    
+    
 
     if (option === "🚔 지구대 / 경찰서 안내") {
       setPoliceSearchMode(true);
