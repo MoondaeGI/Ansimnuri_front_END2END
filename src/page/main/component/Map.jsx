@@ -9,6 +9,7 @@ import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
 import {useDirections} from "../../../util";
 import {NoteList} from "../../../component";
+import {Button} from "react-bootstrap";
 
 export const Map = () => {
     const { setNoteList, connect } = useNoteStore()
@@ -320,7 +321,6 @@ export const Map = () => {
             }));
         }, []);
 
-
         return (
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 {mapRef.current?.getMap() && (
@@ -413,7 +413,6 @@ export const Map = () => {
                             <div className="user-marker" />
                         </Marker>
                     )}
-                    <NoteList />
                 </MapGL>
                 <button
                     onClick={toggleView}
