@@ -8,7 +8,7 @@
 .mainContainer {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   max-width: 100%;
   margin: 0 auto;
   background-color: #b9b9b9;
@@ -35,7 +35,7 @@
 
 .newsList {
   flex: 1;
-  overflow-y: auto;
+   overflow-y: auto; 
 }
 
 .mapSection {
@@ -45,11 +45,12 @@
   background-color: #fff;
 }
 .newsPanel {
-  width: 300px;
+  width: 330px;
   background-color: #f9f9f9;
   border-left: 1px solid #ddd;
   display: flex;
   flex-direction: column;
+   overflow: hidden;
 }
 
 .mapContainer {
