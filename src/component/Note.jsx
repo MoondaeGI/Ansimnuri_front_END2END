@@ -17,7 +17,6 @@ export const Note = ({id: _id}) => {
     const loginId = useAuthStore(state => state.userId)
 
     const [form, setForm] = useState(() =>({...dto}))
-    const [replyList, setReplyList] = useState([])
     const [isUpdate, setIsUpdate] = useState(false)
 
     function toggleUpdateForm() {
@@ -41,20 +40,6 @@ export const Note = ({id: _id}) => {
                     alert("삭제되었습니다.")
                 })
         }
-    }
-
-    function openReply(e) {
-        e.preventDefault();
-
-        caxios.get('/api/note/reply/' + id)
-            .then(res => {
-                console.log(res)
-                setReplyList(prev =>
-                    res.data.map(reply =>
-                        <NoteReply key={reply.id} dto={reply} />)
-                )
-            })
-            .catch(ignored => {})
     }
 
     const noteContent = () => {
@@ -116,55 +101,7 @@ export const Note = ({id: _id}) => {
             <div className="card post-it-note">
                 <div className="card-body">
                     {isUpdate ? updateNote() : noteContent()}
-
-                    <hr className="note-divider" />
-
-                    <div className="reply-section">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h6 className="card-title mb-0">댓글 {replyCount}개</h6>
-                            <Button className="btn btn-outline-secondary btn-sm" onClick={openReply}>
-                                열기
-                            </Button>
-                        </div>
-                        <div className="reply-list mb-3">{replyList}</div>
-                        <div className="mb-3">
-                            <textarea className="form-control note-textarea" rows="2" placeholder="댓글을 입력하세요..."></textarea>
-                        </div>
-                        <div className="d-flex justify-content-end">
-                            <Button className="btn btn-primary btn-sm me-2">등록</Button>
-                        </div>
-                    </div>
                 </div>
-            </div>
-        </div>
-    )
-}
-
-export const NoteReply = ({dto}) => {
-    const {id, content, userId, nickname, regDate, recCount} = dto
-    const date = parseDate(regDate)
-
-    const update = (e) => {
-        e.preventDefault();
-    }
-
-    const deleteById = (e) => {
-        e.preventDefault();
-    }
-
-    return (
-        <div>
-            <div>
-                <div>{id}</div>
-                <div>{content}</div>
-                <div>{userId}</div>
-                <div>{recCount}</div>
-                <div>{nickname}</div>
-                <div>{date}</div>
-            </div>
-            <div>
-                <Button onClick={update}>수정</Button>
-                <Button onClick={deleteById}>삭제</Button>
             </div>
         </div>
     )
@@ -213,16 +150,14 @@ export const NoteList = () => {
                     key={note.id}
                     latitude={note.latitude}
                     longitude={note.longitude}
-                    onClick={(e) => {  // onClick 오타 수정
+                    onClick={(e) => {
                         e.originalEvent.stopPropagation();
                         setSelectedNote(note);
                     }}
                 >
-                    <div className="marker"></div>  {/* 마커 스타일링을 위한 div 추가 */}
+                    <div className="marker"></div>
                 </Marker>
             ))}
-
-            {/* Popup을 Marker 밖으로 이동 */}
             {selectedNote && (
                 <Popup
                     longitude={selectedNote.longitude}
@@ -238,7 +173,7 @@ export const NoteList = () => {
                     className="custom-popup"
                     onClose={() => setSelectedNote(null)}
                 >
-                    <div onClick={(e) => e.stopPropagation()}>  {/* 추가 이벤트 버블링 방지 */}
+                    <div onClick={(e) => e.stopPropagation()}>
                         <Note id={selectedNote.id} />
                     </div>
                 </Popup>

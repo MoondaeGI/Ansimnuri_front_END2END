@@ -2,6 +2,7 @@
   width: 80%;
   max-width: 600px;
   margin: 0 auto;
+  display: flex ;
 }
 
 .text-xl {
@@ -13,10 +14,11 @@
 }
 
 .innerBox {
+  width: 60%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-
+margin: auto;
   margin-bottom: 0.5rem;
 }
 

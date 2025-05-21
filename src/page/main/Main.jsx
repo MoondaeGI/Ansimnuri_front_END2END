@@ -66,7 +66,6 @@ useEffect(() => {
             localStorage.setItem("isIntroDone", "true");
           }}
         />
-
      
         <button className="newsToggleBtn step1" onClick={toggleNews}>
           📰

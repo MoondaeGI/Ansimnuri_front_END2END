@@ -4,7 +4,7 @@ import axios from 'axios';
 import caxios from '../../lib/caxios';
 import './css/Login.css';
 import { useAuthStore } from '../../store';
-
+import { useEffect } from 'react';
 export const Login = () => {
   const [form, setForm] = useState({ loginId: '', password: '' });
   const [forgotPwMode, setForgotPwMode] = useState(false);
@@ -16,7 +16,14 @@ export const Login = () => {
   const [idVerified, setIdVerified] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [isCodeVerified, setIsCodeVerified] = useState(false);
-const [newLoginId, setNewLoginId] = useState('');
+  const [newLoginId, setNewLoginId] = useState('');
+
+  const [kakaoIdInput, setKakaoIdInput] = useState('');
+  const [nicknameInput, setNicknameInput] = useState('');
+  const KAKAO_REST_API_KEY = 'ff57aa7051dcd1d80b6e0f8fc712c345';
+  const K_REDIRECT_URI = 'http://localhost/oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
+
+  const KAKAO_AUTH_URL = `http://localhost/oauth2/authorization/kakao`;
 
 
   const navigate = useNavigate();
@@ -25,7 +32,43 @@ const [newLoginId, setNewLoginId] = useState('');
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const handleKakaoLogin = () => {
 
+    window.location.href = "http://localhost/oauth2/authorization/kakao";
+    // Spring Security가 제공하는 기본 경로
+  };
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  const id = params.get("id");
+  const nickname = params.get("nickname");
+  console.log({ token, id, nickname });
+  if (token) {
+    // 이미 회원인 경우 로그인 처리
+    localStorage.setItem("token", token);
+    setAuth(token, id);
+    alert("카카오 로그인 성공");
+    navigate("/mypage");
+  } else if (id && nickname) {
+    // 간편회원가입용 정보 세팅
+    setKakaoIdInput(id);
+    setNicknameInput(nickname);
+  }
+}, []);
+
+  const handleSimpleSignup = async () => {
+    try {
+      await axios.post('http://localhost/api/member/kakaoSignup', {
+        kakaoId: kakaoIdInput,
+        nickname: nicknameInput,
+      });
+      alert("회원가입 성공! 다시 로그인 해주세요.");
+      navigate('/login');
+    } catch (err) {
+      alert("간편회원가입 실패");
+      console.error(err);
+    }
+  };
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -37,7 +80,11 @@ const [newLoginId, setNewLoginId] = useState('');
       navigate('/');
     } catch (err) {
       console.error("로그인 실패:", err.response?.data || err.message);
-      alert('아이디와 비밀번호를 확인해주세요');
+      if (err.response.status === 403) {
+        window.alert(err.response.data);
+      } else {
+        alert('아이디와 비밀번호를 확인해주세요');
+      }
     }
   };
 
@@ -78,7 +125,7 @@ const [newLoginId, setNewLoginId] = useState('');
       setEmailVerified(false);
       setIdVerified(false);
       setNewPassword('');
-     setIdForReset('');
+      setIdForReset('');
       setEmailForReset('');
 
     } catch (err) {
@@ -107,7 +154,7 @@ const [newLoginId, setNewLoginId] = useState('');
   };
 
   return (
-    <div className="login-container">
+    <div className="loginContainer">
       <h2>로그인</h2>
       <form onSubmit={handleLogin}>
         <div>
@@ -130,23 +177,27 @@ const [newLoginId, setNewLoginId] = useState('');
             placeholder="비밀번호를 입력하세요"
           />
         </div>
-        <div>
+        <div className='buttonBox'>
           <button type="submit" disabled={forgotPwMode}>로그인</button>
+
           <button type="button" onClick={handleRegister}>회원가입</button>
+            <div className="kakao" onClick={handleKakaoLogin}>
+            <img src='/icons/kakao.png' className="kakaoImg" />
+          </div>
           <p>
-            <button type="button" onClick={() => setForgotIdMode(true)} className="forgotIdBtn">
-              아이디가 기억나지 않으세요? 🤔
-            </button>
-            <button type="button" onClick={() => setForgotPwMode(true)} className="forgotPasswordBtn">
-              비밀번호가 기억나지 않으세요? 🤔
-            </button>
+            <span onClick={() => setForgotIdMode(true)} className="forgotIdBtn">
+              아이디찾기            </span>
+           
+            <span  onClick={() => setForgotPwMode(true)} className="forgotPasswordBtn">
+              비밀번호찾기
+            </span>
             {forgotPwMode && (
-              <div className="forgot-password-box">
+              <div className="passwordBox">
                 {!idVerified ? (
                   <p>
                     <strong>회원가입 시 입력한 아이디 입력:</strong>
                     <input
-                    
+
                       value={idForReset}
                       onChange={(e) => setIdForReset(e.target.value)}
                     />
@@ -160,13 +211,13 @@ const [newLoginId, setNewLoginId] = useState('');
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                     />
-                    <button type="button"onClick={changePasswordById}>비밀번호 재설정</button>
+                    <button type="button" onClick={changePasswordById}>비밀번호 재설정</button>
                   </p>
                 )}
               </div>
             )}
             {forgotIdMode && (
-              <div className="forgot-password-box">
+              <div className="passwordBox">
                 {!emailVerified ? (
                   <p>
                     <strong>회원가입 시 이메일 입력:</strong>
@@ -192,6 +243,8 @@ const [newLoginId, setNewLoginId] = useState('');
           </p>
         </div>
       </form>
+     
+
     </div>
   );
 };

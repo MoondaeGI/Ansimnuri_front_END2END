@@ -1,5 +1,4 @@
 import './css/Map.css';
-import { NoteList } from "../../../component";
 import { useNoteStore } from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -8,7 +7,8 @@ import axios from 'axios';
 import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
-
+import {useDirections} from "../../../util";
+import {NoteList} from "../../../component";
 
 export const Map = () => {
     const { setNoteList, connect } = useNoteStore()
@@ -25,7 +25,7 @@ export const Map = () => {
             connect()
         }, 1000)
 
-        return clearInterval(reConnect)
+        return () => clearInterval(reConnect)
     }, [connect])
 
     const SEOUL_BOUNDS = {
@@ -48,7 +48,10 @@ export const Map = () => {
         const mapRef = useRef(null);
         const [markerPos, setMarkerPos] = useState(null);
         const [streetlights, setStreetlights] = useState([]);
+        const [sexOffenders, setSexOffenders] = useState([]);
+        const [cctvs, setCctvs] = useState([]);
         const [showLights, setShowLights] = useState(false);
+        const [showOffenders, setShowOffenders] = useState(false);
         const [viewState, setViewState] = useState({
             ...SEOUL_CENTER,
             zoom: 11,
@@ -56,13 +59,15 @@ export const Map = () => {
             bearing: 0
         });
 
+        const { routeGeoJSON, loading, error } = useDirections(searchMarker, userLocation);
+
         const toGeoJSON = items => ({
             type: 'FeatureCollection',
             features: items.map(p => ({
                 type: 'Feature',
                 geometry: {
                     type: 'Point',
-                    coordinates: [p.latitude, p.longitude]
+                    coordinates: [p.longitude, p.latitude]
                 },
                 properties: { id: p.id, name: p.name, address: p.address, type: p.type }
             }))
@@ -85,6 +90,20 @@ export const Map = () => {
                 alert('GPS를 지원하지 않는 브라우저입니다.');
             }
         };
+
+        useEffect(() => {
+            axios.get("http://localhost/api/map/sexOffender")
+                .then(res => {
+                    setSexOffenders(res.data);
+                })
+        }, [])
+
+        useEffect(() => {
+            axios.get("http://localhost/api/map/cctv")
+                .then(res => {
+                    setCctvs(res.data);
+                })
+        }, []);
 
         useEffect(() => {
             axios.get("http://localhost/api/map/police").then((resp => {
@@ -113,13 +132,6 @@ export const Map = () => {
             setViewState(constrainView({ ...evt.viewState, pitch }));
         }, [calculatePitch]);
 
-        // 검색박스 선택
-        const handleSearchSelect = useCallback(({ result }) => {
-            if (!result?.geometry) return;
-            const [lon, lat] = result.geometry.coordinates;
-            setViewState({ longitude: lon, latitude: lat, zoom: 14, pitch: 45, bearing: 0 });
-        }, []);
-
         const onMapLoad = useCallback((e) => {
             const map = mapRef.current?.getMap();
             if (!map || map.getLayer('3d-buildings')) return;
@@ -147,27 +159,6 @@ export const Map = () => {
                 });
             });
 
-            // 눈 효과 적용 (한 번만 호출)
-            // map.on('style.load', () => {
-            //   map.setRain({
-            //     density: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.7],
-            //     intensity: 1.0,
-            //     color: '#ffffff',
-            //     'flake-size': 1.2,
-            //     opacity: 0.9,
-            //     vignette: ['interpolate', ['linear'], ['zoom'], 11, 0, 13, 0.4]
-            //   });
-            // });
-            // // 초기 스타일에도 바로 눈 내리기
-            // map.setRain({
-            //   density: 0.7,
-            //   intensity: 1.0,
-            //   color: '#ffffff',
-            //   'flake-size': 1.2,
-            //   opacity: 0.9,
-            //   vignette: 0.4
-            // });
-
             map.addSource('police-stations', {
                 type: 'geojson',
                 data: { type: 'FeatureCollection', features: [] }
@@ -186,10 +177,43 @@ export const Map = () => {
                 }
             });
 
+            map.addSource('sex-offender', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            map.addLayer({
+                id: 'offender-layer',
+                type: 'circle',
+                source: 'sex-offender',
+                layout: { visibility: showLights ? 'visible' : 'none' },
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#645394',
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
+            map.addSource('cctv', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            map.addLayer({
+                id: 'cctv-layer',
+                type: 'circle',
+                source: 'cctv',
+                layout: { visibility: showLights ? 'visible' : 'none' },
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#c4c4c4',
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#fff'
+                }
+            });
+
             map.on('style.load', () => {
-                //map.setConfigProperty('basemap', 'lightPreset', 'dawn');  // 일출
-                // map.setConfigProperty('basemap', 'lightPreset', 'day');   // 낮
-                // map.setConfigProperty('basemap', 'lightPreset', 'dusk');  // 일몰
                 map.setConfigProperty('basemap', 'lightPreset', 'night'); // 밤
             });
 
@@ -265,6 +289,28 @@ export const Map = () => {
             );
         }, [streetlights, showLights]);
 
+        useEffect(() => {
+            const map = mapRef.current?.getMap();
+            if (!map || !map.getSource('sex-offender')) return;
+            map.getSource('sex-offender').setData(toGeoJSON(sexOffenders));
+            map.setLayoutProperty(
+                'offender-layer',
+                'visibility',
+                showLights ? 'visible' : 'none'
+            );
+        }, [sexOffenders, showLights]);
+
+        useEffect(() => {
+            const map = mapRef.current?.getMap();
+            if (!map || !map.getSource('cctv')) return;
+            map.getSource('cctv').setData(toGeoJSON(cctvs));
+            map.setLayoutProperty(
+                'cctv-layer',
+                'visibility',
+                showLights ? 'visible' : 'none'
+            );
+        }, [sexOffenders, showLights]);
+
         const toggleView = useCallback(() => {
             setViewState(prev => constrainView({
                 ...prev,
@@ -298,6 +344,30 @@ export const Map = () => {
                             fuzzyMatch: true
                         }}
                         placeholder='주소 또는 지역명 검색'
+                        onRetrieve={(result) => {
+                            console.log(result);
+
+                            const [lon, lat] = result.features[0].geometry.coordinates;
+
+                            console.log(lon, lat)
+
+                            if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(
+                                    (position) => {
+                                        const { latitude, longitude } = position.coords;
+                                        setUserLocation({ latitude, longitude });
+                                        // 검색 위치 설정
+                                        setSearchMarker({
+                                            longitude: lon,
+                                            latitude: lat
+                                        });
+                                    },
+                                    (error) => {
+                                        console.error('GPS 위치를 가져올 수 없습니다:', error);
+                                    }
+                                );
+                            }
+                        }}
                     />
                 )}
                 <MapGL

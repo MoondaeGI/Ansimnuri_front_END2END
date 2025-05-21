@@ -47,11 +47,11 @@
   width: 60%;
 }
 
-
 .infoBox button {
+  margin-left: 15px;
+  width: 18%;
   padding: 8px 16px;
-  margin-top: 10px;
-  margin-right: 10px;
+
   background-color: #3498db !important;
   color: #ffffff;
   border: none;
@@ -66,7 +66,58 @@
   background-color: #2980b9;
 }
 
+.mypageButtonArea {
+  position: relative;
+  margin-top: 40px;
+}
 
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.actionButtons button {
+  padding: 10px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #3498db;
+  color: white;
+}
+.emailCheck{
+  width: 60% !important;
+
+}
+.actionButtons button:hover {
+  background-color: #2980b9;
+}
+.passwordBox{
+  display: flex;
+}
+.withdrawBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 12px;
+  padding: 6px 12px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pageBtnBox {
+  display: flex;
+  justify-content: center; 
+  gap: 16px;               
+  margin-top: 30px;          
+}
+
+.withdrawBtn:hover {
+  background-color: #c0392b;
+}
 @media (max-width: 600px) {
   .mypageContainer {
     padding: 20px;
