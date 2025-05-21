@@ -95,7 +95,7 @@ PWA 앱으로 설치할 수 있어요!<br />
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link href="/download">앱 다운로드</Nav.Link>
+       
               <Nav.Link href="/notice/list">공지사항</Nav.Link>
               <Nav.Link href="/qna/list">QNA</Nav.Link>
               <Nav.Link href="/guide" onClick={openGuide}>이용가이드</Nav.Link>
