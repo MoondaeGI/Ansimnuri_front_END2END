@@ -21,9 +21,9 @@ export const Login = () => {
   const [kakaoIdInput, setKakaoIdInput] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
   const KAKAO_REST_API_KEY = 'ff57aa7051dcd1d80b6e0f8fc712c345';
-  const K_REDIRECT_URI = 'http://localhost/oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
+  const K_REDIRECT_URI = 'https://ansimnuri-357149454857.asia-northeast3.run.app/oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
 
-  const KAKAO_AUTH_URL = `http://localhost/oauth2/authorization/kakao`;
+  const KAKAO_AUTH_URL = `https://ansimnuri-357149454857.asia-northeast3.run.app//oauth2/authorization/kakao`;
 
 
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export const Login = () => {
   };
   const handleKakaoLogin = () => {
 
-    window.location.href = "http://localhost/oauth2/authorization/kakao";
+    window.location.href = "http://https://ansimnuri-357149454857.asia-northeast3.run.app//oauth2/authorization/kakao";
     // Spring Security가 제공하는 기본 경로
   };
   useEffect(() => {
@@ -58,7 +58,7 @@ export const Login = () => {
 
   const handleSimpleSignup = async () => {
     try {
-      await axios.post('http://localhost/api/member/kakaoSignup', {
+      await axios.post('https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/kakaoSignup', {
         kakaoId: kakaoIdInput,
         nickname: nicknameInput,
       });
@@ -73,7 +73,7 @@ export const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost/api/member/login', form);
+      const response = await axios.post('https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/login', form);
       const { id, token } = response.data;
       setAuth(token, id);
       alert('로그인 성공');

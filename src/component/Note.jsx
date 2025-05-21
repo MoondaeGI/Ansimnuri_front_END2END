@@ -17,7 +17,6 @@ export const Note = ({id: _id}) => {
     const loginId = useAuthStore(state => state.userId)
 
     const [form, setForm] = useState(() =>({...dto}))
-    const [replyList, setReplyList] = useState([])
     const [isUpdate, setIsUpdate] = useState(false)
 
     function toggleUpdateForm() {
@@ -41,20 +40,6 @@ export const Note = ({id: _id}) => {
                     alert("삭제되었습니다.")
                 })
         }
-    }
-
-    function openReply(e) {
-        e.preventDefault();
-
-        caxios.get('/api/note/reply/' + id)
-            .then(res => {
-                console.log(res)
-                setReplyList(prev =>
-                    res.data.map(reply =>
-                        <NoteReply key={reply.id} dto={reply} />)
-                )
-            })
-            .catch(ignored => {})
     }
 
     const noteContent = () => {
@@ -122,36 +107,6 @@ export const Note = ({id: _id}) => {
     )
 }
 
-export const NoteReply = ({dto}) => {
-    const {id, content, userId, nickname, regDate, recCount} = dto
-    const date = parseDate(regDate)
-
-    const update = (e) => {
-        e.preventDefault();
-    }
-
-    const deleteById = (e) => {
-        e.preventDefault();
-    }
-
-    return (
-        <div>
-            <div>
-                <div>{id}</div>
-                <div>{content}</div>
-                <div>{userId}</div>
-                <div>{recCount}</div>
-                <div>{nickname}</div>
-                <div>{date}</div>
-            </div>
-            <div>
-                <Button onClick={update}>수정</Button>
-                <Button onClick={deleteById}>삭제</Button>
-            </div>
-        </div>
-    )
-}
-
 export const EmptyNote = ({latitude, longitude}) => {
     const [form, setForm] = useState({
         latitude: latitude,
@@ -195,16 +150,14 @@ export const NoteList = () => {
                     key={note.id}
                     latitude={note.latitude}
                     longitude={note.longitude}
-                    onClick={(e) => {  // onClick 오타 수정
+                    onClick={(e) => {
                         e.originalEvent.stopPropagation();
                         setSelectedNote(note);
                     }}
                 >
-                    <div className="marker"></div>  {/* 마커 스타일링을 위한 div 추가 */}
+                    <div className="marker"></div>
                 </Marker>
             ))}
-
-            {/* Popup을 Marker 밖으로 이동 */}
             {selectedNote && (
                 <Popup
                     longitude={selectedNote.longitude}
@@ -220,7 +173,7 @@ export const NoteList = () => {
                     className="custom-popup"
                     onClose={() => setSelectedNote(null)}
                 >
-                    <div onClick={(e) => e.stopPropagation()}>  {/* 추가 이벤트 버블링 방지 */}
+                    <div onClick={(e) => e.stopPropagation()}>
                         <Note id={selectedNote.id} />
                     </div>
                 </Popup>

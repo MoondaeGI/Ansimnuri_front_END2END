@@ -28,7 +28,7 @@ const navigate = useNavigate();
   useEffect(() => {
     const fetchMember = async () => {
       try {
-        const res = await caxios.get('http://localhost/api/member/me', {
+        const res = await caxios.get('https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/me', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -158,7 +158,7 @@ if(window.confirm){
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('회원 정보가 수정되었습니다.');
-      const updated = await caxios.get('http://localhost/api/member/me', {
+      const updated = await caxios.get('https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/me', {
         headers: {
           Authorization: `Bearer ${token}`
         }

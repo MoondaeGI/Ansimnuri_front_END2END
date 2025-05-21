@@ -6,7 +6,7 @@ export const News = () => {
   const [newsList, setNewsList] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost/api/news")
+    axios.get("http://ansimnuri.site/api/news")
       .then(res => {
         console.log(res)
         setNewsList(res.data);
@@ -24,13 +24,12 @@ export const News = () => {
       <div className="newsCardList">
         {newsList.map((article, index) => (
           <div className="newsCard" key={index}>
-            <div className="newsImgWrapper">
-
-              <img
-                src={article.img ? article.img : process.env.PUBLIC_URL + '/icons/noimage.jpg'}
-                className="newsImg"
-              />
-            </div>
+             <div
+              className="newsImgWrapper"
+              style={{
+                backgroundImage: `url(${article.img ? article.img : process.env.PUBLIC_URL + '/icons/noimage.jpg'})`
+              }}
+            />
             <div className="newsContent">
               <h3 className="newsTitle">
                 <a

@@ -13,7 +13,7 @@ export const ChatBot = () => {
 
   useEffect(() => {
     if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      scrollToBottom();
     }
   }, [chatLog]);
 
@@ -92,7 +92,9 @@ export const ChatBot = () => {
   const scrollToBottom = () => {
     setTimeout(() => {
       if (chatEndRef.current) {
-        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+        const chatWindow = chatEndRef.current.parentElement;
+        const scrollHeight = chatWindow.scrollHeight;
+        chatWindow.scrollTop = scrollHeight;
       }
     }, 50);
   };
