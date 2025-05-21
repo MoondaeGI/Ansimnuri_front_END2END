@@ -8,9 +8,7 @@ import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
 import {useDirections} from "../../../util";
-import {Button, Card} from "react-bootstrap";
 import {NoteList} from "../../../component";
-
 
 export const Map = () => {
     const { setNoteList, connect } = useNoteStore()
@@ -133,29 +131,7 @@ export const Map = () => {
             const pitch = calculatePitch(evt.viewState.zoom);
             setViewState(constrainView({ ...evt.viewState, pitch }));
         }, [calculatePitch]);
-/*
-        // 검색박스 선택
-        const handleSearchSelect = useCallback(({ result }) => {
-            console.log(result);
-            if (!result?.geometry) return;
-            const [lon, lat] = result.geometry.coordinates;
-            setViewState({ longitude: lon, latitude: lat, zoom: 14, pitch: 45, bearing: 0 });
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (coords) => {
-                        const { latitude, longitude } = coords;
-                        setUserLocation({ latitude, longitude });
-                        console.log(coords);
-                    },
-                    (error) => {
-                        console.error('GPS 위치를 가져올 수 없습니다:', error);
-                    }
-                );
-            }
-
-        }, []);
- */
         const onMapLoad = useCallback((e) => {
             const map = mapRef.current?.getMap();
             if (!map || map.getLayer('3d-buildings')) return;
