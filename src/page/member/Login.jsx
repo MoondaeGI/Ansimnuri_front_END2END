@@ -21,9 +21,9 @@ export const Login = () => {
   const [kakaoIdInput, setKakaoIdInput] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
   const KAKAO_REST_API_KEY = 'ff57aa7051dcd1d80b6e0f8fc712c345';
-  const K_REDIRECT_URI = 'http://https://ansimnuri-357149454857.asia-northeast3.run.app//oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
+  const K_REDIRECT_URI = 'https://ansimnuri-357149454857.asia-northeast3.run.app/oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
 
-  const KAKAO_AUTH_URL = `http://https://ansimnuri-357149454857.asia-northeast3.run.app//oauth2/authorization/kakao`;
+  const KAKAO_AUTH_URL = `https://ansimnuri-357149454857.asia-northeast3.run.app//oauth2/authorization/kakao`;
 
 
   const navigate = useNavigate();
