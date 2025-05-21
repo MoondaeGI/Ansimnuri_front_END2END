@@ -21,9 +21,9 @@ export const Login = () => {
   const [kakaoIdInput, setKakaoIdInput] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
   const KAKAO_REST_API_KEY = 'ff57aa7051dcd1d80b6e0f8fc712c345';
-  const K_REDIRECT_URI = 'http://localhost/oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
+  const K_REDIRECT_URI = 'http://ansimnuri.site/oauth2/authorization/kakao'; // 백엔드 OAuth2 설정 주소
 
-  const KAKAO_AUTH_URL = `http://localhost/oauth2/authorization/kakao`;
+  const KAKAO_AUTH_URL = `http://ansimnuri.site/oauth2/authorization/kakao`;
 
 
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export const Login = () => {
   };
   const handleKakaoLogin = () => {
 
-    window.location.href = "http://localhost/oauth2/authorization/kakao";
+    window.location.href = "http://ansimnuri.site/oauth2/authorization/kakao";
     // Spring Security가 제공하는 기본 경로
   };
   useEffect(() => {

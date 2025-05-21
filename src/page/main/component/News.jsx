@@ -6,7 +6,7 @@ export const News = () => {
   const [newsList, setNewsList] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost/api/news")
+    axios.get("http://ansimnuri.site/api/news")
       .then(res => {
         console.log(res)
         setNewsList(res.data);

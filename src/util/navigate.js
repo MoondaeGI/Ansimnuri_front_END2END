@@ -17,7 +17,7 @@ export function useDirections(origin, destination) {
         setError(null);
 
         console.log(origin, destination, DIRECTIONS_API_KEY);
-        axios.get('http://localhost/api/map/directions', {
+        axios.get('https://ansimnuri-357149454857.asia-northeast3.run.app/api/map/directions', {
             params: {
                 originLat: origin.latitude,
                 originLng: origin.longitude,

@@ -81,7 +81,7 @@ const [isIdAvailable, setIsIdAvailable] = useState(null);
     }
 
     try {
-      const response = await axios.get(`http://localhost/api/member/checkId/${form.loginId}`);
+      const response = await axios.get(`https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/checkId/${form.loginId}`);
       const exists = response.data;
 
       if (exists) {
@@ -108,7 +108,7 @@ const [isIdAvailable, setIsIdAvailable] = useState(null);
     }
 
     try {
-      const response = await axios.get(`http://localhost/api/member/checkNickName/${form.nickname}`);
+      const response = await axios.get(`https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/checkNickName/${form.nickname}`);
       const exists = response.data;
 
       if (exists) {
@@ -264,7 +264,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    await axios.post('http://localhost/api/member/register', form);
+    await axios.post('https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/register', form);
     alert('회원가입 성공');
     navi("/");
   } catch (err) {

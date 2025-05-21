@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const caxios = axios.create({
-  baseURL: 'http://localhost', // 필요한 base URL
+  baseURL: 'https://ansimnuri-357149454857.asia-northeast3.run.app/', // 필요한 base URL
 });
 
 // 요청 인터셉터 설정

@@ -16,7 +16,7 @@ export const Map = () => {
     const { setNoteList, connect } = useNoteStore()
 
     useEffect(() => {
-        axios.get('http://localhost:80/api/note')
+        axios.get('http://ansimnuri.site/api/note')
             .then(resp => {
                 setNoteList(resp.data)
             })
