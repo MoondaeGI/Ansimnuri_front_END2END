@@ -186,10 +186,10 @@ export const Login = () => {
           </div>
           <p>
             <span onClick={() => setForgotIdMode(true)} className="forgotIdBtn">
-              아이디찾기            </span>
+              아이디재설정            </span>
            
             <span  onClick={() => setForgotPwMode(true)} className="forgotPasswordBtn">
-              비밀번호찾기
+              비밀번호재설정
             </span>
             {forgotPwMode && (
               <div className="passwordBox">

@@ -119,15 +119,15 @@ export const ChatBot = () => {
       return;
     }
     
-    try {
-      await fetch("http://localhost:80/api/dashboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ menuName: option })
-      });
-    } catch (err) {
-      console.error("클릭 로그 전송 실패:", err);
-    }
+    // try {
+    //   await fetch("http://localhost:80/api/dashboard", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ menuName: option })
+    //   });
+    // } catch (err) {
+    //   console.error("클릭 로그 전송 실패:", err);
+    // }
 
     if (option === "🚩 이전으로") {
       if (previousMenu) {
