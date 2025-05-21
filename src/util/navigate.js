@@ -2,8 +2,6 @@ import {useState, useEffect} from 'react';
 import axios from 'axios';
 import {pem as polyline} from "node-forge";
 
-const DIRECTIONS_API_KEY = process.env.REACT_GOOGLE_DIRECTIONS_API_KEY;
-
 export function useDirections(origin, destination) {
     const [routeGeoJSON, setRouteGeoJSON] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -15,9 +13,9 @@ export function useDirections(origin, destination) {
 
         setLoading(true);
         setError(null);
-
         console.log(origin, destination, DIRECTIONS_API_KEY);
         axios.get('https://ansimnuri-357149454857.asia-northeast3.run.app/api/map/directions', {
+
             params: {
                 originLat: origin.latitude,
                 originLng: origin.longitude,

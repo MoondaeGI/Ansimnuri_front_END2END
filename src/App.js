@@ -9,8 +9,6 @@ import { useEffect, useState } from 'react'
 import { useAuthStore,useNoteStore  } from './store'
 import { Steps } from 'intro.js-react';
 import KakaoRedirect from './page/member/KakaoRedirect';
-
-
 import 'intro.js/introjs.css';
 
 function App() {
