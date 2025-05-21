@@ -60,7 +60,7 @@ function SimpleRegisterPage() {
         }
 
         try {
-            const response = await axios.get(`http://localhost/api/member/checkNickName/${form.nickname}`);
+            const response = await axios.get(`https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/checkNickName/${form.nickname}`);
             const exists = response.data;
 
             if (exists) {
@@ -91,7 +91,7 @@ function SimpleRegisterPage() {
         }
 
         try {
-            await axios.post('http://localhost/api/member/kakaoSignup',{
+            await axios.post('https://ansimnuri-357149454857.asia-northeast3.run.app/api/member/kakaoSignup',{
                  kakaoId: form.kakaoId,
     nickname: form.nickname,
     email: form.email,
@@ -230,7 +230,7 @@ function SimpleRegisterPage() {
             </div>
             <label className="formLabel">주소</label>
              <div className='kakaoBox'>
-                <input type="text" name="address" value={form.address}  value={form.address} readOnly placeholder="기본주소" />
+                <input type="text" name="address" value={form.address} readOnly placeholder="기본주소" />
             </div>
             <label className="formLabel">상세주소</label>
                <div className='kakaoBox'>
