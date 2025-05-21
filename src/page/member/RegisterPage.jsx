@@ -16,7 +16,7 @@ export const RegisterPage = () => {
     address: '',
     detailAddress: ''
   });
-
+const [isIdAvailable, setIsIdAvailable] = useState(null);
   const [pwMessage, setPwMessage] = useState('');
   const [pwMatchMessage, setPwMatchMessage] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
@@ -39,6 +39,9 @@ export const RegisterPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  if (name === 'loginId') {
+  setIsIdAvailable(null);
+}
 
     if (name === 'password') {
       const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{8,}$/;
@@ -66,6 +69,8 @@ export const RegisterPage = () => {
           : '이메일 형식이 아닙니다.'
       );
     }
+
+
   };
 
   const checkId = async () => {
@@ -81,16 +86,19 @@ export const RegisterPage = () => {
 
       if (exists) {
         alert("이미 사용 중인 아이디입니다.");
+              setIsIdAvailable(false);
         setForm({ ...form, loginId: '' });
         idInputRef.current.focus();
       } else {
         alert("사용 가능한 아이디입니다.");
+             setIsIdAvailable(true);
       }
     } catch (err) {
       alert("오류 발생");
       console.error(err);
     }
   };
+
 
   const checkNickName = async () => {
     if (!form.nickname) {
@@ -213,33 +221,64 @@ const confirmAndCheck = () => {
     }
   };
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { loginId, password, rePassword, nickname, email, postcode, address, detailAddress } = form;
 
+  // 정규식 검사
+  const pwValid = /^(?=.*[a-zA-Z])(?=.*\d).{8,}$/.test(password);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+ if (isIdAvailable === null) {
+    alert("아이디 중복 확인을 해주세요.");
+    idInputRef.current.focus();
+    return;
+  }
+   if (isIdAvailable === false) {
+    alert("이미 사용 중인 아이디입니다. 아이디를 다시 입력해주세요.");
+    idInputRef.current.focus();
+    return;
+  }
+  if (!loginId || !password || !rePassword || !nickname || !email || !postcode || !address || !detailAddress) {
+    alert("모든 필수 항목을 입력해주세요.");
+    return;
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { loginId, password, rePassword, nickname, email, postcode, address, detailAddress } = form;
+  if (!pwValid) {
+    alert("비밀번호는 8자 이상이며 영문과 숫자를 포함해야 합니다.");
+    return;
+  }
 
-    if (!loginId || !password || !rePassword || !nickname || !email || !postcode || !address || !detailAddress) {
-      alert("모든 필수 항목을 입력해주세요.");
-      return;
-    }
+  if (password !== rePassword) {
+    alert("비밀번호가 일치하지 않습니다.");
+    return;
+  }
 
-    try {
-      await axios.post('http://localhost:80/api/member/register', form);
-      alert('회원가입 성공');
-      navi("/");
-    } catch (err) {
-      alert('회원가입 실패');
-      console.error(err);
-    }
-  };
-  // 유효성검사해서 true인 경우에 submit되도록 추가 코드 넣어줘야됨
+  if (!emailValid) {
+    alert("올바른 이메일 형식이 아닙니다.");
+    return;
+  }
+
+  if (!agreements.terms || !agreements.privacy) {
+    alert("이용약관 및 개인정보 수집에 동의해주세요.");
+    return;
+  }
+
+  try {
+    await axios.post('http://localhost/api/member/register', form);
+    alert('회원가입 성공');
+    navi("/");
+  } catch (err) {
+    alert('회원가입 실패');
+    console.error(err);
+  }
+};
+
 
   return (
     <div className="container">
-      <h2 className="text-xl font-bold mb-4">회원가입</h2>
-      <div className='innerBox'>
 
+      <div className='innerBox'>
+      <h2 className="text-xl font-bold mb-4">회원가입</h2>
         <form onSubmit={handleSubmit}>
           <div className='box'>
             <label className="formLabel">아이디</label> <input name="loginId" ref={idInputRef} placeholder="아이디" onChange={handleChange} className="input" />
@@ -258,7 +297,7 @@ const confirmAndCheck = () => {
           <div className='box'>
             <label className="formLabel">닉네임</label><input name="nickname" ref={nickNameInputRef} placeholder="닉네임" onChange={handleChange} className="input" />
             <button className="btn" type='button' onClick={checkNickName}>중복확인</button>
-          </div><br />
+          </div>
           <div className='box'>
             <label className="formLabel">이메일</label><input type="email" name="email" onChange={handleChange} className="input" /></div><br />
           <div className="text-sm" style={{ color: emailMessage.includes('올바른') ? 'green' : 'red' }}>
@@ -267,10 +306,8 @@ const confirmAndCheck = () => {
 
           <div className="box">
             <label className="formLabel">우편번호</label>
-
             <input type="text" className="input" name="postcode" value={form.postcode} readOnly />
             <button type="button" className="btn" onClick={handlePostcode}>검색</button>
-
           </div>
 
           <div className="box">
@@ -316,14 +353,12 @@ const confirmAndCheck = () => {
         {showModal && (
           <div className="modalBackdrop" onClick={closeModal}>
             <div className="modalContent" onClick={(e) => e.stopPropagation()}>
-              <h3>약관 상세</h3>
+              <h3>상세 동의서</h3>
               <pre style={{ whiteSpace: 'pre-wrap' }}>{modalContent}</pre>
               <div className="modalButtons">
                 <button onClick={closeModal}>닫기</button>
                 <button onClick={confirmAndCheck}>확인</button>
               </div>
-
-
             </div>
           </div>
         )}

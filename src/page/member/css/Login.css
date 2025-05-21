@@ -1,70 +1,93 @@
-.login-container {
-  max-width: 400px;
+.loginContainer {
+  width: 360px;
   margin: 80px auto;
-  padding: 40px;
+  padding: 30px;
   background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  animation: fadeIn 0.5s ease-in-out;
+  font-family: 'Pretendard', sans-serif;
 }
 
-.login-container h2 {
+.loginContainer h2 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #2c3e50;
+  margin-bottom: 24px;
+  color: #333;
 }
 
-.login-container form div {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
+.loginContainer form > div {
+  margin-bottom: 18px;
 }
 
-.login-container label {
+.loginContainer label {
+  display: block;
   margin-bottom: 8px;
-  font-weight: bold;
-  color: #34495e;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.login-container input {
+.loginContainer input[type="text"],
+.loginContainer input[type="password"],
+.loginContainer input[type="email"] {
+  width: 100%;
   padding: 10px 12px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 15px;
-  transition: border-color 0.3s;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-.login-container input:focus {
-  border-color: #3498db;
-  outline: none;
+.buttonBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.login-container button {
+.buttonBox button {
+  padding: 10px 0;
   width: 100%;
-  padding: 10px;
-  margin-top: 8px;
+  background-color: #007bff;
   border: none;
-  border-radius: 8px;
-  background-color: #3498db;
+  border-radius: 6px;
   color: white;
-  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background 0.2s ease-in-out;
 }
 
-.login-container button:hover {
-  background-color: #2980b9;
+.buttonBox button:hover {
+  background-color: #0056b3;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.kakao {
+  width: 100%;
+  padding: 10px;
+  background-color: #fee500;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+.forgotIdBtn {
+  margin-right: 10px;
+}
+
+.kakao:hover {
+  background-color: #f7d600;
+}
+
+
+.passwordBox {
+  margin-top: 12px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.passwordBox p {
+  margin-bottom: 10px;
 }
