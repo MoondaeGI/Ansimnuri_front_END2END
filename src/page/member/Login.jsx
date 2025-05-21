@@ -181,7 +181,10 @@ export const Login = () => {
           <button type="submit" disabled={forgotPwMode}>로그인</button>
 
           <button type="button" onClick={handleRegister}>회원가입</button>
-            <div className="kakao" onClick={handleKakaoLogin}>
+            <div className="kakao pe-none" onClick={(e)=>{
+              e.preventDefault()
+              e.stopPropagation();
+              }}>
             <img src='/icons/kakao.png' className="kakaoImg" />
           </div>
           <p>

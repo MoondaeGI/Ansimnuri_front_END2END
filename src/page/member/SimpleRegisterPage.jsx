@@ -78,33 +78,40 @@ function SimpleRegisterPage() {
         }
     };
 
-    const handleSubmit = async (e) => {
-          e.preventDefault(); 
-        if (!form.kakaoId || !form.nickname || !form.email || !form.address || !form.detailAddress || !form.postcode) {
-            alert("모든 필수 항목을 입력해주세요.");
-            return;
-        }
+   const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        if (!agreements.terms || !agreements.privacy) {
-            alert("이용약관 및 개인정보 수집에 동의해주세요.");
-            return;
-        }
+    if (!form.kakaoId || !form.nickname || !form.email || !form.address || !form.detailAddress || !form.postcode) {
+        alert("모든 필수 항목을 입력해주세요.");
+        return;
+    }
 
-        try {
-            await axios.post('http://localhost/api/member/kakaoSignup',{
-                 kakaoId: form.kakaoId,
-    nickname: form.nickname,
-    email: form.email,
-    address: form.address,
-    detailAddress: form.detailAddress,
-    postcode: form.postcode});
-            alert('회원가입 성공! 다시 로그인 해주세요.');
-            navigate('/login');
-        } catch (err) {
-            alert('회원가입 실패');
-            console.error(err);
-        }
-    };
+    if (!agreements.terms || !agreements.privacy) {
+        alert("이용약관 및 개인정보 수집에 동의해주세요.");
+        return;
+    }
+
+    try {
+        // 1. 회원가입 요청
+        await axios.post('http://localhost/api/member/kakaoSignup', {
+            kakaoId: form.kakaoId,
+            nickname: form.nickname,
+            email: form.email,
+            address: form.address,
+            detailAddress: form.detailAddress,
+            postcode: form.postcode
+        });
+
+        alert('회원가입 성공! 자동 로그인을 위해 카카오 로그인으로 이동합니다.');
+
+        // 2. 다시 카카오 로그인 (Spring Security가 토큰 발급)
+        window.location.href = 'http://localhost/oauth2/authorization/kakao';
+
+    } catch (err) {
+        alert('회원가입 실패');
+        console.error(err);
+    }
+};
 
     const openAgreementModal = (type) => {
         setAgreedType(type);
