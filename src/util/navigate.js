@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 import axios from 'axios';
 import {pem as polyline} from "node-forge";
 
-const DIRECTIONS_API_KEY = process.env.GOOGLE_DIRECTIONS_API_KEY;
+const DIRECTIONS_API_KEY = process.env.REACT_GOOGLE_DIRECTIONS_API_KEY;
 
 export function useDirections(origin, destination) {
     const [routeGeoJSON, setRouteGeoJSON] = useState(null);
@@ -16,14 +16,25 @@ export function useDirections(origin, destination) {
         setLoading(true);
         setError(null);
 
-        axios.get('https://maps.googleapis.com/maps/api/directions/json', {
+        console.log(origin, destination, DIRECTIONS_API_KEY);
+        axios.get('http://localhost/api/map/directions', {
             params: {
-                origin:      `${origin.lat},${origin.lng}`,
-                destination: `${destination.lat},${destination.lng}`,
-                key:         DIRECTIONS_API_KEY,
+                originLat: origin.latitude,
+                originLng: origin.longitude,
+                destLat: destination.latitude,
+                destLng: destination.longitude,
             }
         })
-            .then(res => {
+            .then(response => {
+                console.log(response)
+                if (response.data && response.data.routes && response.data.routes.length > 0) {
+                    // 경로 데이터 처리
+                    const route = response.data.routes[0];
+                    return route;
+                } else {
+                    throw new Error('경로를 찾을 수 없습니다.');
+                }
+                /*
                 const encoded = res.data.routes?.[0]?.overview_polyline?.points;
                 if (!encoded) throw new Error('경로를 찾을 수 없습니다');
                 const coords = polyline.decode(encoded).map(([lat, lng]) => [lng, lat]);
@@ -32,6 +43,8 @@ export function useDirections(origin, destination) {
                     geometry: { type: 'LineString', coordinates: coords },
                     properties: {}
                 });
+
+                 */
             })
             .catch(err => {
                 console.error(err);

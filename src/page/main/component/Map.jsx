@@ -9,6 +9,7 @@ import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
 import {useDirections} from "../../../util";
 import {Button, Card} from "react-bootstrap";
+import {NoteList} from "../../../component";
 
 
 export const Map = () => {
@@ -26,7 +27,7 @@ export const Map = () => {
             connect()
         }, 1000)
 
-        return clearInterval(reConnect)
+        return () => clearInterval(reConnect)
     }, [connect])
 
     const SEOUL_BOUNDS = {
@@ -68,7 +69,7 @@ export const Map = () => {
                 type: 'Feature',
                 geometry: {
                     type: 'Point',
-                    coordinates: [p.latitude, p.longitude]
+                    coordinates: [p.longitude, p.latitude]
                 },
                 properties: { id: p.id, name: p.name, address: p.address, type: p.type }
             }))
@@ -369,20 +370,21 @@ export const Map = () => {
                         placeholder='주소 또는 지역명 검색'
                         onRetrieve={(result) => {
                             console.log(result);
-                            const [lon, lat] = result.geometry.coordinates;
 
-                            // 검색 위치 설정
-                            setSearchMarker({
-                                longitude: lon,
-                                latitude: lat,
-                            });
+                            const [lon, lat] = result.features[0].geometry.coordinates;
 
+                            console.log(lon, lat)
 
                             if (navigator.geolocation) {
                                 navigator.geolocation.getCurrentPosition(
-                                    (coords) => {
-                                        const { latitude, longitude } = coords;
+                                    (position) => {
+                                        const { latitude, longitude } = position.coords;
                                         setUserLocation({ latitude, longitude });
+                                        // 검색 위치 설정
+                                        setSearchMarker({
+                                            longitude: lon,
+                                            latitude: lat
+                                        });
                                     },
                                     (error) => {
                                         console.error('GPS 위치를 가져올 수 없습니다:', error);
@@ -418,7 +420,6 @@ export const Map = () => {
                         </Marker>
                     )}
                     {searchMarker && (
-                        <>
                         <Marker
                             longitude={searchMarker.longitude}
                             latitude={searchMarker.latitude}
@@ -426,40 +427,6 @@ export const Map = () => {
                         >
                             <div className="search-marker" />
                         </Marker>
-                            <Popup
-                                longitude={searchMarker.longitude}
-                                latitude={searchMarker.latitude}
-                                closeButton={true}
-                                closeOnClick={false}
-                                anchor="bottom"
-                            >
-                                <Card style={{ border: 'none' }}>
-                                    <Card.Body className="p-2">
-                                        <Card.Title className="h6 mb-2">{searchMarker.name || '선택한 위치'}</Card.Title>
-                                        <div className="d-flex gap-2">
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    console.log("click")
-                                                }
-                                                }>길찾기
-                                            </Button>
-                                            <Button
-                                                variant="outline-secondary"
-                                                size="sm"
-                                                onClick={() => {
-                                                    // 팝업 닫기 등 추가 기능
-                                                }}
-                                            >
-                                                닫기
-                                            </Button>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Popup>
-                        </>
                     )}
                     {userLocation && (
                         <Marker
@@ -470,6 +437,7 @@ export const Map = () => {
                             <div className="user-marker" />
                         </Marker>
                     )}
+                    <NoteList />
                 </MapGL>
                 <button
                     onClick={toggleView}
