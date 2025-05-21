@@ -120,16 +120,6 @@ export const ChatBot = () => {
       resetChat();
       return;
     }
-    
-    // try {
-    //   await fetch("http://localhost:80/api/dashboard", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ menuName: option })
-    //   });
-    // } catch (err) {
-    //   console.error("클릭 로그 전송 실패:", err);
-    // }
 
     if (option === "🚩 이전으로") {
       if (previousMenu) {
@@ -200,6 +190,18 @@ export const ChatBot = () => {
       setPoliceSearchMode(true);
       setChatLog(prev => [...prev, { role: "assistant", content: `'${option}' 메뉴를 선택하셨습니다.
 안내받고 싶은 지역명을 입력해주세요.😊` }]);
+    }else if (option === "🏡 안전한 귀가 경로 추천") {
+      setChatLog(prev => [...prev, {
+        role: "assistant",
+        content: `🛣️ 안전한 귀가 경로 추천을 선택하셨어요!
+메인 지도에 표시된 네비게이션 기능을 통해 위험도 데이터를 확인하면서 길 안내를 받을 수 있어요.💚💚
+위험도가 높은 지역을 실시간으로 확인하실 수 있으니, 위험도가 많은 지역을 우회하며 안심하고 이동하세요! 😌`
+      }, {
+        role: "menu",
+        options: ["🏠 처음으로"]
+      }]);
+      scrollToBottom();
+      return;
     } else {
       setPoliceSearchMode(false);
     }
@@ -237,6 +239,7 @@ export const ChatBot = () => {
       handleFinalSelection(parentMenu, option);
     }
   };
+  
 
   const handleFinalSelection = (parentMenu, input) => {
     if (parentMenu === "🚨 범죄 피해 대처 요령") {
