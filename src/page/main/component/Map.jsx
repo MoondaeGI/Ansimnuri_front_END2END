@@ -1,4 +1,4 @@
-import './css/Map.css';
+import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css';
 import { useNoteStore } from "../../../store";
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -7,9 +7,11 @@ import axios from 'axios';
 import { Map as MapGL, Marker, Popup } from 'react-map-gl/mapbox';
 import * as mapboxgl from 'mapbox-gl';
 import { SearchBox } from '@mapbox/search-js-react';
-import {useDirections} from "../../../util";
-import {NoteList} from "../../../component";
-import {Button} from "react-bootstrap";
+import { useDirections } from "../../../util";
+import { NoteList } from "../../../component";
+import { Button } from "react-bootstrap";
+import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
+import './css/Map.css';
 
 export const Map = () => {
     const { setNoteList, connect } = useNoteStore()
@@ -53,6 +55,8 @@ export const Map = () => {
         const [cctvs, setCctvs] = useState([]);
         const [showLights, setShowLights] = useState(false);
         const [showOffenders, setShowOffenders] = useState(false);
+        const [showNavigation, setShowNavigation] = useState(false);
+        const directionsRef = useRef(null);
         const [viewState, setViewState] = useState({
             ...SEOUL_CENTER,
             zoom: 11,
@@ -136,11 +140,25 @@ export const Map = () => {
         const onMapLoad = useCallback((e) => {
             const map = mapRef.current?.getMap();
             if (!map || map.getLayer('3d-buildings')) return;
+            if (!map || directionsRef.current) return;
 
             map.addControl(new MapboxLanguage({
                 defaultLanguage: 'ko',
                 supportedLanguages: ['ko', 'ko-Hang', 'ko-KR']
             }));
+
+            if (!directionsRef.current) {
+                directionsRef.current = new MapboxDirections({
+                    accessToken: MAPBOX_TOKEN,
+                    unit: 'metric',
+                    profile: 'mapbox/driving',
+                    language: 'ko',
+                    placeholderOrigin: '출발지를 입력하세요',
+                    placeholderDestination: '도착지를 입력하세요',
+                    controls: { inputs: true, instructions: true, profileSwitcher: true },
+                    flyTo: false
+                });
+            }
 
             map.on('style.load', () => {
                 map.getStyle().layers.forEach(layer => {
@@ -257,20 +275,20 @@ export const Map = () => {
             } catch (error) {
                 console.error('Terrain setup failed:', error);
             }
-            
+
             setTimeout(() => {
                 const style = map.getStyle();
                 if (!style?.layers) return;
                 style.layers.forEach(layer => {
-                  if (layer.type === 'symbol' && layer.layout?.['text-field']) {
-                    map.setLayoutProperty(
-                      layer.id,
-                      'text-field',
-                      ['coalesce', ['get', 'name_ko'], ['get', 'name']]
-                    );
-                  }
+                    if (layer.type === 'symbol' && layer.layout?.['text-field']) {
+                        map.setLayoutProperty(
+                            layer.id,
+                            'text-field',
+                            ['coalesce', ['get', 'name_ko'], ['get', 'name']]
+                        );
+                    }
                 });
-              }, 1000);
+            }, 1000);
 
             // 지도 이동 제한 설정
             map.setMaxBounds([
@@ -321,6 +339,21 @@ export const Map = () => {
             }));
         }, []);
 
+        const toggleNavigation = useCallback(() => {
+            const map = mapRef.current?.getMap();
+            const dir = directionsRef.current;
+            if (!map || !dir) return;
+            const isAttached = Boolean(dir._map);
+            if (!isAttached) {
+                map.addControl(dir, 'top-left');
+            } else {
+                map.removeControl(dir);
+            }
+            setShowNavigation(!isAttached);
+        }, []);
+
+
+
         return (
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 {mapRef.current?.getMap() && (
@@ -329,6 +362,7 @@ export const Map = () => {
                         map={mapRef.current.getMap()}
                         mapboxgl={mapboxgl}
                         marker={true}
+                        icon={false}
                         options={{
                             countries: ['kr'],
                             languages: ['ko'],
@@ -356,7 +390,6 @@ export const Map = () => {
                                     (position) => {
                                         const { latitude, longitude } = position.coords;
                                         setUserLocation({ latitude, longitude });
-                                        // 검색 위치 설정
                                         setSearchMarker({
                                             longitude: lon,
                                             latitude: lat
@@ -419,20 +452,20 @@ export const Map = () => {
                     style={{
                         position: 'absolute', top: 95, right: 10, zIndex: 1,
                         padding: '8px 12px', backgroundColor: '#fff', border: '1px solid #ddd',
-                        borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', color: 'black',
                         cursor: 'pointer', fontSize: '14px'
                     }}>
-                    {viewState.pitch > 0 ? '2D 보기' : '3D 보기'}
+                    {viewState.pitch > 0 ? '2D' : '3D'}
                 </button>
                 <button
                     onClick={() => setShowLights(v => !v)}
                     style={{
-                        position: 'absolute', top: 45, right: 10, zIndex: 1,
-                        padding: '8px 12px', background: '#fff', border: '1px solid #ddd',
+                        position: 'absolute', top: 50, right: 10, zIndex: 1,
+                        padding: '8px 12px', background: '#fff', border: '1px solid #ddd', color: 'black',
                         cursor: 'pointer'
                     }}
                 >
-                    {showLights ? '지구대 숨기기' : '지구대 보기'}
+                    {showLights ? '지구대 숨기기' : '지구대'}
                 </button>
                 <button
                     className="gps-button"
@@ -448,17 +481,36 @@ export const Map = () => {
                         border: '1px solid #ddd',
                         borderRadius: '4px',
                         cursor: 'pointer',
-                        fontSize: '16px'
+                        fontSize: '16px',
+                        color: 'black'
                     }}
                 >GPS
+                </button>
+                <button
+                    onClick={toggleNavigation}
+                    style={{
+                        position: 'absolute',
+                        top: 190,
+                        right: 10,
+                        zIndex: 1,
+                        padding: '8px 12px',
+                        backgroundColor: '#fff',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        color: 'black',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                    }}>
+                    {showNavigation ? '네비게이션 숨기기' : '네비게이션'}
                 </button>
             </div>
         );
     };
 
- return (
-  <div style={{ height: '100%' }}>
-    <SeoulMap3D />
-  </div>
-);
+    return (
+        <div style={{ height: '100%' }}>
+            <SeoulMap3D />
+        </div>
+    );
 };
